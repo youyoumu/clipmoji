@@ -1,5 +1,6 @@
 import "./index.css";
 
+import { HeroUIProvider } from "@heroui/react";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
@@ -33,7 +34,9 @@ if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <StrictMode>
-      <RouterProvider router={router} />
+      <HeroUIProvider>
+        <RouterProvider router={router} />
+      </HeroUIProvider>
     </StrictMode>,
   );
 }

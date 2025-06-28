@@ -1,3 +1,4 @@
+import { Button } from "@heroui/react";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
@@ -5,5 +6,9 @@ export const Route = createFileRoute("/")({
 });
 
 function App() {
-  return <div className="bg-red-100">test</div>;
+  return (
+    <div className="bg-red-100">
+      <Button>Test</Button>
+    </div>
+  );
 }
