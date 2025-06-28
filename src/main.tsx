@@ -19,8 +19,6 @@ const router = createRouter({
   defaultPreloadStaleTime: 0,
 });
 
-const a = 1;
-
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {
   interface Register {
