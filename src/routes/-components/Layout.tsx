@@ -11,6 +11,8 @@ import {
 } from "@heroui/react";
 import { type ReactNode, useState } from "react";
 
+import SettingsButton from "./SettingsButton";
+
 export default function Layout({ children }: { children: ReactNode }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -28,12 +30,8 @@ export default function Layout({ children }: { children: ReactNode }) {
   ];
 
   return (
-    <div className="min-h-svh h-svh max-h-svh bg-background flex flex-col items-center">
-      <Navbar
-        onMenuOpenChange={setIsMenuOpen}
-        isBordered
-        className="text-foreground"
-      >
+    <div className="min-h-svh h-svh max-h-svh  flex flex-col items-center">
+      <Navbar onMenuOpenChange={setIsMenuOpen} isBordered>
         <NavbarContent>
           <NavbarMenuToggle
             aria-label={isMenuOpen ? "Close menu" : "Open menu"}
@@ -90,6 +88,9 @@ export default function Layout({ children }: { children: ReactNode }) {
             <Button as={Link} color="primary" href="#" variant="flat">
               Sign Up
             </Button>
+          </NavbarItem>
+          <NavbarItem>
+            <SettingsButton />
           </NavbarItem>
         </NavbarContent>
       </Navbar>
