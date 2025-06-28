@@ -1,11 +1,12 @@
+import "./index.css";
+
+import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
 
+import reportWebVitals from "./reportWebVitals.ts";
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
-import reportWebVitals from "./reportWebVitals.ts";
-import "./index.css";
 
 // Create a new router instance
 const router = createRouter({
@@ -16,6 +17,8 @@ const router = createRouter({
   defaultStructuralSharing: true,
   defaultPreloadStaleTime: 0,
 });
+
+const a = 1;
 
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {
