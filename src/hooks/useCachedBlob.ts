@@ -1,10 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery } from "@tanstack/react-query";
 import wretch from "wretch";
 
 import { db } from "#/lib/db";
 
-export function useCachedBlob(src: string) {
-  return useQuery({
+export const cachedBlobQueryOptions = ({ src }: { src: string }) =>
+  queryOptions({
     queryKey: ["cachedBlob", { src }],
     async queryFn() {
       const cachedBlob = await db.cachedBlob.where("src").equals(src).first();
@@ -41,5 +41,10 @@ export function useCachedBlob(src: string) {
       }
       return null;
     },
+  });
+
+export function useCachedBlob(src: string) {
+  return useQuery({
+    ...cachedBlobQueryOptions({ src }),
   });
 }

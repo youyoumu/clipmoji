@@ -2,13 +2,14 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { sort } from "fast-sort";
 import { useRef } from "react";
 
-import { useFavoriteGifs } from "#/hooks/useFavoriteGifs";
+import { useFavoriteGifsWithBlob } from "#/hooks/useFavoriteGifs";
 import { useTailwindBreakpoints } from "#/hooks/useTailwindBreakPoints";
 
 import GifCard from "./GifCard";
 
 export function RootPage() {
-  const { data: favoriteGifs = [] } = useFavoriteGifs();
+  const { data: favoriteGifs = [] } = useFavoriteGifsWithBlob();
+
   const sortedFavoriteGifs = sort(favoriteGifs).desc((item) => item.order);
   const { current } = useTailwindBreakpoints();
 

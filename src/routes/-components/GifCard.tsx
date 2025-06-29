@@ -1,5 +1,5 @@
 import { Card, CardBody, CardHeader, Image } from "@heroui/react";
-import { memo } from "react";
+import { memo, useEffect, useState } from "react";
 import ReactPlayer from "react-player";
 
 import { useCachedBlob } from "#/hooks/useCachedBlob";
@@ -7,6 +7,7 @@ import type { FavGif } from "#/lib/db";
 
 function GifCard_({ favGif }: { favGif: FavGif }) {
   const { data: blob } = useCachedBlob(favGif.src);
+
   return (
     <Card className="py-4">
       <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
@@ -32,23 +33,37 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
             );
           }
           if (blob.type === "video/mp4") {
-            return (
-              <ReactPlayer
-                className="rounded-xl"
-                src={blobUrl}
-                playing
-                loop
-                playsInline
-                muted
-                controls={false}
-                width="100%"
-                height="100%"
-              />
-            );
+            return <ReactPlayerDelayed url={blobUrl} />;
           }
         })()}
       </CardBody>
     </Card>
+  );
+}
+
+function ReactPlayerDelayed({ url }: { url: string }) {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        setReady(true);
+      }, 250);
+    });
+  }, []);
+
+  return (
+    <ReactPlayer
+      className="rounded-xl"
+      src={url}
+      playing={ready}
+      loop
+      playsInline
+      muted
+      controls={false}
+      width="100%"
+      height="100%"
+    />
   );
 }
 
