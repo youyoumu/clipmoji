@@ -1,13 +1,12 @@
 import { Card, CardBody, CardHeader, Image } from "@heroui/react";
+import { memo } from "react";
 import ReactPlayer from "react-player";
 
 import { useCachedBlob } from "#/hooks/useCachedBlob";
 import type { FavGif } from "#/lib/db";
 
-export default function GifCard({ favGif }: { favGif: FavGif }) {
+function GifCard_({ favGif }: { favGif: FavGif }) {
   const { data: blob } = useCachedBlob(favGif.src);
-  if (!blob) return null;
-  const blobUrl = URL.createObjectURL(blob);
   return (
     <Card className="py-4">
       <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
@@ -17,6 +16,8 @@ export default function GifCard({ favGif }: { favGif: FavGif }) {
       </CardHeader>
       <CardBody className="overflow-visible py-2">
         {(() => {
+          if (!blob) return null;
+          const blobUrl = URL.createObjectURL(blob);
           if (blob.type === "image/gif") {
             return (
               <Image
@@ -33,6 +34,7 @@ export default function GifCard({ favGif }: { favGif: FavGif }) {
           if (blob.type === "video/mp4") {
             return (
               <ReactPlayer
+                className="rounded-xl"
                 src={blobUrl}
                 playing
                 loop
@@ -49,3 +51,6 @@ export default function GifCard({ favGif }: { favGif: FavGif }) {
     </Card>
   );
 }
+
+const GifCard = memo(GifCard_);
+export default GifCard;
