@@ -7,7 +7,7 @@ const db = new Dexie("ClipmojiDatabase") as Dexie & {
 
 db.version(1).stores({
   favGif: "++id, key, src, width, height, type",
-  cachedBlob: "++id, src, blob",
+  cachedBlob: "++id, src, blob, httpStatus",
 });
 
 export type FavGif = {
@@ -23,7 +23,8 @@ export type FavGif = {
 export type CachedBlob = {
   id: number;
   src: string;
-  blob: Blob;
+  blob: Blob | null;
+  httpStatus: number | null;
 };
 
 export { db };

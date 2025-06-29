@@ -10,10 +10,18 @@ export function useCachedBlob(src: string) {
       const cachedBlob = await db.cachedBlob.where("src").equals(src).first();
       if (cachedBlob) return cachedBlob.blob;
       const blob = await wretch(src)
+        .options({ mode: "cors" })
         .get()
         .blob()
-        .catch((error) => {
+        .catch(async (error) => {
           if (error instanceof wretch.WretchError) {
+            if (error.status === 404) {
+              await db.cachedBlob.add({
+                src: src,
+                blob: null,
+                httpStatus: error.status,
+              });
+            }
             return null;
           }
           if (error instanceof TypeError) {
@@ -27,6 +35,7 @@ export function useCachedBlob(src: string) {
         await db.cachedBlob.add({
           src: src,
           blob: blob,
+          httpStatus: null,
         });
         return blob;
       }
