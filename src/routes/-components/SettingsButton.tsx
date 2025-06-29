@@ -13,6 +13,8 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import protobuf from "protobufjs";
 import { FaKey } from "react-icons/fa";
 import wretch from "wretch";
+
+import { db } from "#/lib/db";
 /*
 const iframe = document.createElement("iframe");
 console.log(
@@ -24,6 +26,21 @@ console.log(
 );
 iframe.remove();
 */
+
+type FrecentyUserSettings = {
+  favoriteGifs: {
+    gifs: Record<
+      string,
+      {
+        format: 1 | 2;
+        height: number;
+        width: number;
+        order: number;
+        src: string;
+      }
+    >;
+  };
+};
 
 export default function SettingsButton() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -53,10 +70,20 @@ export default function SettingsButton() {
         const Message = root.lookupType(
           "discord_protos.discord_users.v1.FrecencyUserSettings",
         );
-        const decoded = Message.decode(protobufBinary);
-        //@ts-expect-error unknown type
-        const favoriteGifs = decoded.favoriteGifs.gifs;
-        console.log("DEBUG[102]: decoded=", favoriteGifs);
+        const decoded = Message.decode(
+          protobufBinary,
+        ) as unknown as FrecentyUserSettings;
+        const favoriteGifs = Object.entries(decoded.favoriteGifs.gifs);
+        for (const [key, value] of favoriteGifs) {
+          await db.favGif.add({
+            key: key,
+            src: value.src,
+            order: value.order,
+            type: value.format === 1 ? "gif" : "mp4",
+            height: value.height,
+            width: value.width,
+          });
+        }
       });
   };
 
