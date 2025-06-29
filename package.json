@@ -16,6 +16,7 @@
     "@heroui/react": "^2.7.11",
     "@heroui/system": "^2.4.18",
     "@heroui/theme": "^2.4.17",
+    "@tanstack/react-query": "^5.81.5",
     "@tanstack/react-router": "^1.121.2",
     "@tanstack/react-router-devtools": "^1.121.2",
     "@tanstack/router-plugin": "^1.121.2",
