@@ -50,22 +50,39 @@ export default function SettingsButton() {
   const onImportClick = async () => {
     addToast({
       title: "Importing...",
-      promise: importGifs(undefined, {
-        onSuccess({ addedCount }) {
-          addToast({
-            title: "Import Success",
-            description: `Your favorite GIF has been imported. ${addedCount} GIF(s) has been added.`,
-            color: "success",
-          });
+      promise: importGifs(
+        { overwrite: false },
+        {
+          onSuccess({ addedCount, overwrite }) {
+            if (addedCount === 0) {
+              addToast({
+                title: "Import Complete",
+                description:
+                  "All your favorite GIFs were already imported. No new ones were added.",
+                color: "warning",
+              });
+              return;
+            }
+
+            addToast({
+              title: "Import Complete",
+              description: `${addedCount} new favorite GIF${addedCount !== 1 ? "s" : ""} added successfully.${
+                overwrite
+                  ? " Some existing favorite GIFs have been overwritten."
+                  : ""
+              }`,
+              color: "success",
+            });
+          },
+          onError() {
+            addToast({
+              title: "Import Failed",
+              description: "Your favorite GIF has not been imported.",
+              color: "danger",
+            });
+          },
         },
-        onError() {
-          addToast({
-            title: "Import Failed",
-            description: "Your favorite GIF has not been imported.",
-            color: "danger",
-          });
-        },
-      }),
+      ),
       timeout: 1,
     });
   };

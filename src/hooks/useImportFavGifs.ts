@@ -24,7 +24,7 @@ export function useImportFavGifs() {
   const [token] = useLocalStorage<string>("token");
 
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async ({ overwrite }: { overwrite?: boolean }) => {
       const json = (await wretch(
         "https://discord.com/api/v9/users/@me/settings-proto/2",
         {
@@ -73,6 +73,7 @@ export function useImportFavGifs() {
 
       return {
         addedCount: filteredFavGif.length,
+        overwrite: true,
       };
     },
   });
