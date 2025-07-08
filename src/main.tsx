@@ -1,6 +1,7 @@
 import "./index.css";
 
 import { HeroUIProvider } from "@heroui/react";
+import { addToast, ToastProvider } from "@heroui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
@@ -43,6 +44,7 @@ if (rootElement && !rootElement.innerHTML) {
     <StrictMode>
       <HeroUIProvider>
         <QueryClientProvider client={queryClient}>
+          <ToastProvider />
           <RouterProvider router={router} />
         </QueryClientProvider>
       </HeroUIProvider>

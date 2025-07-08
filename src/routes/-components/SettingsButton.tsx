@@ -1,4 +1,5 @@
 import {
+  addToast,
   Button,
   Checkbox,
   Input,
@@ -10,11 +11,9 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import protobuf from "protobufjs";
 import { FaKey } from "react-icons/fa";
-import wretch from "wretch";
 
-import { db } from "#/lib/db";
+import { useImportFavGifs } from "#/hooks/useImportFavGifs";
 /*
 const iframe = document.createElement("iframe");
 console.log(
@@ -46,46 +45,39 @@ export default function SettingsButton() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [token, setToken] = useLocalStorage<string>("token");
 
-  const onTestClick = async () => {
-    wretch("https://discord.com/api/v9/users/@me/settings-proto/2", {
-      headers: {
-        Authorization: token,
-      },
-    })
-      .get()
-      .json(async (json) => {
-        const protobufBinary = Uint8Array.from(atob(json.settings), (c) =>
-          c.charCodeAt(0),
-        );
+  const { mutateAsync: importGifs } = useImportFavGifs();
 
-        const decodedUTF8 = new TextDecoder("utf-8", { fatal: false }).decode(
-          protobufBinary,
-        );
-
-        const protoSchemaUrl =
-          "https://raw.githubusercontent.com/discord-userdoccers/discord-protos/768905de3b7e7b00847cd242d9b7584976017b92/discord_protos/discord_users/v1/FrecencyUserSettings.proto";
-        const protoSchema = await wretch(protoSchemaUrl).get().text();
-        const root = protobuf.parse(protoSchema).root;
-
-        const Message = root.lookupType(
-          "discord_protos.discord_users.v1.FrecencyUserSettings",
-        );
-        const decoded = Message.decode(
-          protobufBinary,
-        ) as unknown as FrecentyUserSettings;
-        const favoriteGifs = Object.entries(decoded.favoriteGifs.gifs);
-        for (const [key, value] of favoriteGifs) {
-          await db.favGif.add({
-            key: key,
-            src: value.src,
-            order: value.order,
-            type: value.format === 1 ? "gif" : "mp4",
-            height: value.height,
-            width: value.width,
+  const onImportClick = async () => {
+    addToast({
+      title: "Importing...",
+      promise: importGifs(undefined, {
+        onSuccess({ addedCount }) {
+          addToast({
+            title: "Import Success",
+            description: `Your favorite GIF has been imported. ${addedCount} GIF(s) has been added.`,
+            color: "success",
           });
-        }
-      });
+        },
+        onError() {
+          addToast({
+            title: "Import Failed",
+            description: "Your favorite GIF has not been imported.",
+            color: "danger",
+          });
+        },
+      }),
+      timeout: 1,
+    });
   };
+
+  function onTestClick() {
+    addToast({
+      title: "Import Success",
+      description: "Your favorite GIF has been imported.",
+      color: "success",
+      timeout: 1000,
+    });
+  }
 
   return (
     <>
@@ -125,13 +117,13 @@ export default function SettingsButton() {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button onPress={onTestClick} variant="flat">
+                <Button variant="flat" onPress={onTestClick}>
                   Test
                 </Button>
                 <Button color="danger" variant="flat" onPress={onClose}>
                   Close
                 </Button>
-                <Button color="primary" variant="solid" onPress={onClose}>
+                <Button color="primary" variant="solid" onPress={onImportClick}>
                   Import Favorite GIF
                 </Button>
               </ModalFooter>
