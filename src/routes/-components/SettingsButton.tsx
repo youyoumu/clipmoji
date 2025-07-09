@@ -15,6 +15,7 @@ import { useLocalStorage, useToggle } from "@uidotdev/usehooks";
 
 import { useExportFavGifs } from "#/hooks/useExportFavGifs";
 import { useImportFavGifs } from "#/hooks/useImportFavGifs";
+import { useSettings } from "#/hooks/useSettings";
 /*
 const iframe = document.createElement("iframe");
 console.log(
@@ -27,76 +28,9 @@ console.log(
 iframe.remove();
 */
 
-type FrecentyUserSettings = {
-  favoriteGifs: {
-    gifs: Record<
-      string,
-      {
-        format: 1 | 2;
-        height: number;
-        width: number;
-        order: number;
-        src: string;
-      }
-    >;
-  };
-};
-
 export default function SettingsButton() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [token, setToken] = useLocalStorage<string>("token");
-  const [settings, setSettings] = useLocalStorage<{
-    overwriteFavoriteGifs: boolean;
-  }>("settings", {
-    overwriteFavoriteGifs: false,
-  });
-
-  const { mutateAsync: importGifs } = useImportFavGifs();
-  const { mutateAsync: exportGifs } = useExportFavGifs();
-
-  const onImportClick = async () => {
-    addToast({
-      title: "Importing...",
-      promise: importGifs(
-        { overwrite: settings.overwriteFavoriteGifs },
-        {
-          onSuccess({ addedCount, overwrite }) {
-            if (addedCount === 0) {
-              addToast({
-                title: "Import Complete",
-                description:
-                  "All your favorite GIFs were already imported. No new ones were added.",
-                color: "warning",
-              });
-              return;
-            }
-
-            addToast({
-              title: "Import Complete",
-              description: `${addedCount} new favorite GIF${addedCount !== 1 ? "s" : ""} added successfully.${
-                overwrite
-                  ? " Some existing favorite GIFs have been overwritten."
-                  : ""
-              }`,
-              color: "success",
-            });
-          },
-          onError() {
-            addToast({
-              title: "Import Failed",
-              description: "Your favorite GIF has not been imported.",
-              color: "danger",
-            });
-          },
-        },
-      ),
-      timeout: 1,
-    });
-  };
-
-  function onExportClick() {
-    exportGifs();
-  }
+  const { settings, setSettings } = useSettings();
 
   function onTestClick() {
     addToast({
@@ -150,12 +84,8 @@ export default function SettingsButton() {
                 <Button color="danger" variant="flat" onPress={onClose}>
                   Close
                 </Button>
-                <Button color="primary" variant="solid" onPress={onExportClick}>
-                  Export Favorite GIFs
-                </Button>
-                <Button color="primary" variant="solid" onPress={onImportClick}>
-                  Import Favorite GIFs
-                </Button>
+                <ExportButton />
+                <ImportButton />
               </ModalFooter>
             </>
           )}
@@ -187,5 +117,70 @@ function APIKeyInput() {
       type={visible ? "text" : "password"}
       variant="bordered"
     />
+  );
+}
+
+function ImportButton() {
+  const { settings } = useSettings();
+  const { mutateAsync: importGifs } = useImportFavGifs();
+
+  const onImportClick = async () => {
+    addToast({
+      title: "Importing...",
+      promise: importGifs(
+        { overwrite: settings.overwriteFavoriteGifs },
+        {
+          onSuccess({ addedCount, overwrite }) {
+            if (addedCount === 0) {
+              addToast({
+                title: "Import Complete",
+                description:
+                  "All your favorite GIFs were already imported. No new ones were added.",
+                color: "warning",
+              });
+              return;
+            }
+
+            addToast({
+              title: "Import Complete",
+              description: `${addedCount} new favorite GIF${addedCount !== 1 ? "s" : ""} added successfully.${
+                overwrite
+                  ? " Some existing favorite GIFs have been overwritten."
+                  : ""
+              }`,
+              color: "success",
+            });
+          },
+          onError() {
+            addToast({
+              title: "Import Failed",
+              description: "Your favorite GIF has not been imported.",
+              color: "danger",
+            });
+          },
+        },
+      ),
+      timeout: 1,
+    });
+  };
+
+  return (
+    <Button color="primary" variant="solid" onPress={onImportClick}>
+      Import Favorite GIFs
+    </Button>
+  );
+}
+
+function ExportButton() {
+  const { mutateAsync: exportGifs } = useExportFavGifs();
+
+  function onExportClick() {
+    exportGifs();
+  }
+
+  return (
+    <Button color="primary" variant="solid" onPress={onExportClick}>
+      Export Favorite GIFs
+    </Button>
   );
 }
