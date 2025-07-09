@@ -10,8 +10,8 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@heroui/react";
-import { useLocalStorage } from "@uidotdev/usehooks";
-import { FaKey } from "react-icons/fa";
+import { IconEye, IconEyeOff } from "@tabler/icons-react";
+import { useLocalStorage, useToggle } from "@uidotdev/usehooks";
 
 import { useImportFavGifs } from "#/hooks/useImportFavGifs";
 /*
@@ -114,20 +114,7 @@ export default function SettingsButton() {
                 Settings
               </ModalHeader>
               <ModalBody>
-                <Input
-                  endContent={
-                    <FaKey className="text-xl text-default-400 flex-shrink-0" />
-                  }
-                  value={token ?? ""}
-                  onChange={(e) => {
-                    setToken(e.target.value);
-                  }}
-                  label="API Key"
-                  placeholder="Enter your API key"
-                  type="password"
-                  variant="bordered"
-                />
-
+                <APIKeyInput />
                 <div className="flex py-2 px-1 justify-between">
                   <Checkbox
                     classNames={{
@@ -161,5 +148,30 @@ export default function SettingsButton() {
         </ModalContent>
       </Modal>
     </>
+  );
+}
+
+function APIKeyInput() {
+  const [token, setToken] = useLocalStorage<string>("token");
+  const [visible, toggle] = useToggle(false);
+
+  return (
+    <Input
+      endContent={
+        visible ? (
+          <IconEyeOff onClick={() => toggle()} className="cursor-pointer" />
+        ) : (
+          <IconEye onClick={() => toggle()} className="cursor-pointer" />
+        )
+      }
+      value={token ?? ""}
+      onChange={(e) => {
+        setToken(e.target.value);
+      }}
+      label="API Key"
+      placeholder="Enter your API key"
+      type={visible ? "text" : "password"}
+      variant="bordered"
+    />
   );
 }
