@@ -7,7 +7,7 @@ import {
   Input,
 } from "@heroui/react";
 import { Chip } from "@heroui/react";
-import { IconCopy } from "@tabler/icons-react";
+import { IconCopy, IconPhotoX } from "@tabler/icons-react";
 import { memo, useEffect, useState } from "react";
 import ReactPlayer from "react-player";
 
@@ -49,7 +49,12 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
       </CardHeader>
       <CardBody className="overflow-visible py-2">
         {(() => {
-          if (!blob) return null;
+          if (!blob)
+            return (
+              <div className="w-full h-32 flex flex-col items-center justify-center">
+                <IconPhotoX className="size-12 text-content3" />
+              </div>
+            );
           const blobUrl = URL.createObjectURL(blob);
           if (blob.type === "image/gif") {
             return (
