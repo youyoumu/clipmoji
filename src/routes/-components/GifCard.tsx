@@ -1,4 +1,13 @@
-import { Card, CardBody, CardHeader, Image } from "@heroui/react";
+import {
+  addToast,
+  Card,
+  CardBody,
+  CardHeader,
+  Image,
+  Input,
+} from "@heroui/react";
+import { Chip } from "@heroui/react";
+import { IconCopy } from "@tabler/icons-react";
 import { memo, useEffect, useState } from "react";
 import ReactPlayer from "react-player";
 
@@ -7,13 +16,36 @@ import type { FavGif } from "#/lib/db";
 
 function GifCard_({ favGif }: { favGif: FavGif }) {
   const { data: blob } = useCachedBlob(favGif.src);
+  const onCopyClick = () => {
+    navigator.clipboard.writeText(favGif.key);
+    addToast({
+      title: "Copied to clipboard",
+      description: favGif.key,
+      color: "primary",
+    });
+  };
 
   return (
     <Card className="py-4">
-      <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
-        <p className="text-tiny uppercase font-bold">Daily Mix</p>
-        <small className="text-default-500">12 Tracks</small>
-        <h4 className="font-bold text-large">Frontend Radio</h4>
+      <CardHeader className="pb-0 pt-0 flex-col items-start gap-2 overflow-hidden">
+        <div className="flex justify-between w-full">
+          <Chip size="sm">{favGif.type}</Chip>
+          <IconCopy
+            className="text-content4 cursor-pointer size-6"
+            onClick={onCopyClick}
+          />
+        </div>
+        <div className="text-default-500 text-xs truncate max-w-full">
+          {favGif.key}
+        </div>
+        <Input
+          size="sm"
+          variant="underlined"
+          label="Note"
+          classNames={{
+            label: "text-xs",
+          }}
+        />
       </CardHeader>
       <CardBody className="overflow-visible py-2">
         {(() => {
