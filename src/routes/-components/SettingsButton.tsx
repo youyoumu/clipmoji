@@ -122,7 +122,7 @@ function APIKeyInput() {
 
 function ImportButton() {
   const { settings } = useSettings();
-  const { mutateAsync: importGifs } = useImportFavGifs();
+  const { mutateAsync: importGifs, isPending } = useImportFavGifs();
 
   const onImportClick = async () => {
     addToast({
@@ -165,21 +165,31 @@ function ImportButton() {
   };
 
   return (
-    <Button color="primary" variant="solid" onPress={onImportClick}>
+    <Button
+      color="primary"
+      variant="solid"
+      onPress={onImportClick}
+      isLoading={isPending}
+    >
       Import Favorite GIFs
     </Button>
   );
 }
 
 function ExportButton() {
-  const { mutateAsync: exportGifs } = useExportFavGifs();
+  const { mutateAsync: exportGifs, isPending } = useExportFavGifs();
 
   function onExportClick() {
     exportGifs();
   }
 
   return (
-    <Button color="primary" variant="solid" onPress={onExportClick}>
+    <Button
+      color="primary"
+      variant="solid"
+      onPress={onExportClick}
+      isLoading={isPending}
+    >
       Export Favorite GIFs
     </Button>
   );
