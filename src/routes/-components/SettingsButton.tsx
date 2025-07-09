@@ -13,6 +13,7 @@ import {
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import { useLocalStorage, useToggle } from "@uidotdev/usehooks";
 
+import { useExportFavGifs } from "#/hooks/useExportFavGifs";
 import { useImportFavGifs } from "#/hooks/useImportFavGifs";
 /*
 const iframe = document.createElement("iframe");
@@ -51,6 +52,7 @@ export default function SettingsButton() {
   });
 
   const { mutateAsync: importGifs } = useImportFavGifs();
+  const { mutateAsync: exportGifs } = useExportFavGifs();
 
   const onImportClick = async () => {
     addToast({
@@ -92,6 +94,10 @@ export default function SettingsButton() {
     });
   };
 
+  function onExportClick() {
+    exportGifs();
+  }
+
   function onTestClick() {
     addToast({
       title: "Import Success",
@@ -106,7 +112,12 @@ export default function SettingsButton() {
       <Button color="primary" variant="flat" onPress={onOpen}>
         Settings
       </Button>
-      <Modal isOpen={isOpen} placement="top-center" onOpenChange={onOpenChange}>
+      <Modal
+        isOpen={isOpen}
+        placement="top-center"
+        onOpenChange={onOpenChange}
+        size="2xl"
+      >
         <ModalContent>
           {(onClose) => (
             <>
@@ -138,6 +149,9 @@ export default function SettingsButton() {
                 </Button>
                 <Button color="danger" variant="flat" onPress={onClose}>
                   Close
+                </Button>
+                <Button color="primary" variant="solid" onPress={onExportClick}>
+                  Export Favorite GIFs
                 </Button>
                 <Button color="primary" variant="solid" onPress={onImportClick}>
                   Import Favorite GIFs
