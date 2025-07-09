@@ -60,7 +60,7 @@ export default function SettingsButton() {
               </ModalHeader>
               <ModalBody>
                 <APIKeyInput />
-                <div className="flex py-2 px-1 justify-between">
+                <div className="flex py-2 px-1 flex-col gap-4">
                   <Checkbox
                     classNames={{
                       label: "text-small",
@@ -74,6 +74,20 @@ export default function SettingsButton() {
                     }}
                   >
                     Overwrite favorite GIFs
+                  </Checkbox>
+                  <Checkbox
+                    classNames={{
+                      label: "text-small",
+                    }}
+                    isSelected={settings.showDeadLinks}
+                    onValueChange={(value) => {
+                      setSettings({
+                        ...settings,
+                        showDeadLinks: value,
+                      });
+                    }}
+                  >
+                    Show dead links
                   </Checkbox>
                 </div>
               </ModalBody>
