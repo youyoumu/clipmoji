@@ -154,7 +154,8 @@ function ImportButton() {
           onError() {
             addToast({
               title: "Import Failed",
-              description: "Your favorite GIF has not been imported.",
+              description:
+                "Something when wrong while importing your favorite GIFs.",
               color: "danger",
             });
           },
@@ -180,7 +181,27 @@ function ExportButton() {
   const { mutateAsync: exportGifs, isPending } = useExportFavGifs();
 
   function onExportClick() {
-    exportGifs();
+    addToast({
+      title: "Exporting...",
+      promise: exportGifs(undefined, {
+        onSuccess() {
+          addToast({
+            title: "Export Complete",
+            description: "Your favorite GIFs have been exported to a zip file.",
+            color: "success",
+          });
+        },
+        onError() {
+          addToast({
+            title: "Export Failed",
+            description:
+              "Something went wrong while exporting your favorite GIFs.",
+            color: "danger",
+          });
+        },
+      }),
+      timeout: 1,
+    });
   }
 
   return (
