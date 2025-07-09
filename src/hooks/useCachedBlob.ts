@@ -10,11 +10,11 @@ export const cachedBlobQueryOptions = ({ src }: { src: string }) =>
       const cachedBlob = await db.cachedBlob.where("src").equals(src).first();
       if (cachedBlob) return cachedBlob.blob;
       const blob = await wretch(src)
-        .options({ mode: "cors" })
         .get()
         .blob()
         .catch(async (error) => {
           if (error instanceof wretch.WretchError) {
+            // if status is 404, add it to the database
             if (error.status === 404) {
               await db.cachedBlob.add({
                 src: src,
@@ -25,6 +25,29 @@ export const cachedBlobQueryOptions = ({ src }: { src: string }) =>
             return null;
           }
           if (error instanceof TypeError) {
+            if (error.message === "Failed to fetch") {
+              // this could be cors error, fetch again with free cors proxy
+              // NOTE: this proxy is dead
+              return null;
+              const blob = await wretch("https://crossorigin.me/" + src)
+                .get()
+                .blob()
+                .catch(async (error) => {
+                  if (error instanceof wretch.WretchError) {
+                    // if status is 404, add it to the database
+                    if (error.status === 404) {
+                      await db.cachedBlob.add({
+                        src: src,
+                        blob: null,
+                        httpStatus: error.status,
+                      });
+                    }
+                    return null;
+                  }
+                  return null;
+                });
+              return blob;
+            }
             return null;
           }
           return null;
