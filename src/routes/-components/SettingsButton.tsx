@@ -44,6 +44,11 @@ type FrecentyUserSettings = {
 export default function SettingsButton() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [token, setToken] = useLocalStorage<string>("token");
+  const [settings, setSettings] = useLocalStorage<{
+    overwriteFavoriteGifs: boolean;
+  }>("settings", {
+    overwriteFavoriteGifs: false,
+  });
 
   const { mutateAsync: importGifs } = useImportFavGifs();
 
@@ -51,7 +56,7 @@ export default function SettingsButton() {
     addToast({
       title: "Importing...",
       promise: importGifs(
-        { overwrite: false },
+        { overwrite: settings.overwriteFavoriteGifs },
         {
           onSuccess({ addedCount, overwrite }) {
             if (addedCount === 0) {
@@ -128,8 +133,15 @@ export default function SettingsButton() {
                     classNames={{
                       label: "text-small",
                     }}
+                    isSelected={settings.overwriteFavoriteGifs}
+                    onValueChange={(value) => {
+                      setSettings({
+                        ...settings,
+                        overwriteFavoriteGifs: value,
+                      });
+                    }}
                   >
-                    Overwrite favorite GIF
+                    Overwrite favorite GIFs
                   </Checkbox>
                 </div>
               </ModalBody>
@@ -141,7 +153,7 @@ export default function SettingsButton() {
                   Close
                 </Button>
                 <Button color="primary" variant="solid" onPress={onImportClick}>
-                  Import Favorite GIF
+                  Import Favorite GIFs
                 </Button>
               </ModalFooter>
             </>
