@@ -1,5 +1,6 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { sort } from "fast-sort";
+import { motion, useScroll, useSpring, useTransform } from "motion/react";
 import { useRef } from "react";
 
 import {
@@ -59,15 +60,29 @@ function RootPage_() {
     },
   });
 
+  const pageHeight = rowVirtualizer.getTotalSize();
+
+  const { scrollY } = useScroll({
+    container: parentRef,
+  }); // measures how many pixels user has scrolled vertically
+
+  const transform = useTransform(scrollY, [0, pageHeight], [0, -pageHeight]);
+  const spring = useSpring(transform, {
+    damping: 9,
+    mass: 0.3,
+    stiffness: 50,
+  }); // apply easing to the negative scroll value
+
   return (
     <div
       ref={parentRef}
-      className="w-full grow flex flex-col overflow-auto items-center h-[calc(100vh-65px)] p-4"
+      className="w-full grow flex flex-col overflow-auto items-center h-[calc(100vh-65px)] p-4 no-scrollbar"
     >
-      <div
+      <motion.div
         className="w-full relative max-w-7xl"
         style={{
           height: `${rowVirtualizer.getTotalSize()}px`,
+          y: spring, // translateY of scroll container using negative scroll value
         }}
       >
         {rowVirtualizer.getVirtualItems().map((virtualRow) => {
@@ -92,7 +107,7 @@ function RootPage_() {
             </div>
           );
         })}
-      </div>
+      </motion.div>
     </div>
   );
 }
