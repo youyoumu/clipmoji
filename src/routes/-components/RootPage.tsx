@@ -76,12 +76,12 @@ function RootPage_() {
   return (
     <div
       ref={parentRef}
-      className="w-full grow flex flex-col overflow-auto items-center h-[calc(100vh-65px)] p-4 no-scrollbar"
+      className="w-full flex flex-col overflow-auto items-center p-4 basis-full"
     >
       <motion.div
         className="w-full relative max-w-7xl"
         style={{
-          height: `${rowVirtualizer.getTotalSize()}px`,
+          // height: `${rowVirtualizer.getTotalSize()}px`,
           y: spring, // translateY of scroll container using negative scroll value
         }}
       >

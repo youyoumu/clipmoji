@@ -30,7 +30,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   ];
 
   return (
-    <div className="min-h-svh flex flex-col items-center">
+    <div className="flex flex-col items-center h-svh">
       <Navbar onMenuOpenChange={setIsMenuOpen} isBordered>
         <NavbarContent>
           <NavbarMenuToggle
