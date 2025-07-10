@@ -10,7 +10,6 @@ import {
 } from "@heroui/react";
 import { Chip } from "@heroui/react";
 import { IconCopy, IconPhotoX } from "@tabler/icons-react";
-import { Observer } from "gsap/Observer";
 import { memo, useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
 
@@ -155,11 +154,11 @@ export function ScrollingText({
         gsap
           .timeline({
             defaults: {
-              ease: "none",
+              ease: "expo.out",
             },
           })
-          .to(tl, { timeScale: factor * 2.5, duration: 0.2, overwrite: true })
-          .to(tl, { timeScale: factor / 2.5, duration: 1 }, "+=0.3");
+          .to(tl, { timeScale: factor * 2.5, duration: 0.2 })
+          .to(tl, { timeScale: factor / 2.5, duration: 1 });
       },
     });
 

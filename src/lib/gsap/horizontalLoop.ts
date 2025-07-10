@@ -14,66 +14,71 @@ Features:
 - times - an Array of the times on the timeline where each element hits the "starting" spot. There's also a label added accordingly, so "label1" is when the 2nd element reaches the start.
 */
 
-//@ts-nocheck
-/* eslint-disable */
 export function horizontalLoop(
-  items: string | object | Element | null,
-  config?: {
+  items_: string | object | Element | null,
+  config: {
     repeat?: number;
     paused?: boolean;
     speed?: number;
     snap?: number | false;
     paddingRight?: number;
     reversed?: boolean;
-  },
+  } = {},
 ) {
-  items = gsap.utils.toArray(items);
-  config = config || {};
-  let tl = gsap.timeline({
-      repeat: config.repeat,
-      paused: config.paused,
-      defaults: { ease: "none" },
-      onReverseComplete: () => tl.totalTime(tl.rawTime() + tl.duration() * 100),
-    }),
-    length = items.length,
-    startX = items[0].offsetLeft,
-    times = [],
-    widths = [],
-    xPercents = [],
-    curIndex = 0,
-    pixelsPerSecond = (config.speed || 1) * 100,
-    snap = config.snap === false ? (v) => v : gsap.utils.snap(config.snap || 1), // some browsers shift by a pixel to accommodate flex layouts, so for example if width is 20% the first element's width might be 242px, and the next 243px, alternating back and forth. So we snap to 5 percentage points to make things look more natural
-    totalWidth,
-    curX,
-    distanceToStart,
-    distanceToLoop,
-    item,
-    i;
+  const items = gsap.utils.toArray(items_) as HTMLDivElement[];
+  const tl = gsap.timeline({
+    repeat: config.repeat,
+    paused: config.paused,
+    defaults: { ease: "none" },
+    onReverseComplete: () => {
+      tl.totalTime(tl.rawTime() + tl.duration() * 100);
+    },
+  });
+  const length = items.length;
+  const startX = items[0].offsetLeft;
+  const times: number[] = [];
+  const widths: number[] = [];
+  const xPercents: number[] = [];
+  let curIndex = 0;
+  const pixelsPerSecond = (config.speed || 1) * 100;
+  const snap =
+    config.snap === false
+      ? (v: number) => v
+      : gsap.utils.snap(config.snap || 1); // some browsers shift by a pixel to accommodate flex layouts, so for example if width is 20% the first element's width might be 242px, and the next 243px, alternating back and forth. So we snap to 5 percentage points to make things look more natural
+  let curX;
+  let distanceToStart;
+  let distanceToLoop;
+  let item;
+  let i;
+
   gsap.set(items, {
     // convert "x" to "xPercent" to make things responsive, and populate the widths/xPercents Arrays to make lookups faster.
     xPercent: (i, el) => {
-      const w = (widths[i] = parseFloat(gsap.getProperty(el, "width", "px")));
+      const w = (widths[i] = parseFloat(
+        gsap.getProperty(el, "width", "px") as string,
+      ));
       xPercents[i] = snap(
-        (parseFloat(gsap.getProperty(el, "x", "px")) / w) * 100 +
-          gsap.getProperty(el, "xPercent"),
+        (parseFloat(gsap.getProperty(el, "x", "px") as string) / w) * 100 +
+          (gsap.getProperty(el, "xPercent") as number),
       );
       return xPercents[i];
     },
   });
   gsap.set(items, { x: 0 });
-  totalWidth =
+  const totalWidth =
     items[length - 1].offsetLeft +
     (xPercents[length - 1] / 100) * widths[length - 1] -
     startX +
     items[length - 1].offsetWidth *
-      gsap.getProperty(items[length - 1], "scaleX") +
-    (parseFloat(config.paddingRight) || 0);
+      (gsap.getProperty(items[length - 1], "scaleX") as number) +
+    (config.paddingRight ?? 0);
   for (i = 0; i < length; i++) {
     item = items[i];
     curX = (xPercents[i] / 100) * widths[i];
     distanceToStart = item.offsetLeft + curX - startX;
     distanceToLoop =
-      distanceToStart + widths[i] * gsap.getProperty(item, "scaleX");
+      distanceToStart +
+      widths[i] * (gsap.getProperty(item, "scaleX") as number);
     tl.to(
       item,
       {
@@ -100,12 +105,19 @@ export function horizontalLoop(
       .add("label" + i, distanceToStart / pixelsPerSecond);
     times[i] = distanceToStart / pixelsPerSecond;
   }
-  function toIndex(index, vars) {
-    vars = vars || {};
-    Math.abs(index - curIndex) > length / 2 &&
-      (index += index > curIndex ? -length : length); // always go in the shortest direction
-    let newIndex = gsap.utils.wrap(0, length, index),
-      time = times[newIndex];
+
+  type Vars = {
+    overwrite?: boolean;
+    modifiers?: {
+      time?: (index: number) => number;
+    };
+  };
+  function toIndex(index: number, vars: Vars = {}) {
+    if (Math.abs(index - curIndex) > length / 2) {
+      index += index > curIndex ? -length : length; // always go in the shortest direction
+    }
+    const newIndex = gsap.utils.wrap(0, length, index);
+    let time = times[newIndex];
     if (time > tl.time() !== index > curIndex) {
       // if we're wrapping the timeline's playhead, make the proper adjustments
       vars.modifiers = { time: gsap.utils.wrap(0, tl.duration()) };
@@ -115,15 +127,20 @@ export function horizontalLoop(
     vars.overwrite = true;
     return tl.tweenTo(time, vars);
   }
-  tl.next = (vars) => toIndex(curIndex + 1, vars);
-  tl.previous = (vars) => toIndex(curIndex - 1, vars);
-  tl.current = () => curIndex;
-  tl.toIndex = (index, vars) => toIndex(index, vars);
-  tl.times = times;
+
   tl.progress(1, true).progress(0, true); // pre-render for performance
   if (config.reversed) {
-    tl.vars.onReverseComplete();
+    tl.vars.onReverseComplete?.();
     tl.reverse();
   }
-  return tl;
+
+  const extra = {
+    next: (vars: Vars) => toIndex(curIndex + 1, vars),
+    previous: (vars: Vars) => toIndex(curIndex - 1, vars),
+    current: () => curIndex,
+    toIndex: (index: number, vars: Vars) => toIndex(index, vars),
+    times: times,
+  };
+
+  return Object.assign(tl, extra);
 }

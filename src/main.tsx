@@ -1,23 +1,19 @@
 import "./index.css";
 
-import { useGSAP } from "@gsap/react";
 import { HeroUIProvider } from "@heroui/react";
 import { ToastProvider } from "@heroui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
-import gsap from "gsap";
-import { Observer } from "gsap/Observer";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 
-gsap.registerPlugin(Observer);
-gsap.registerPlugin(useGSAP);
-// eslint-disable-next-line
-(window as any).gsap = gsap;
+import { gsapInit } from "#/lib/gsap";
 
 import reportWebVitals from "./reportWebVitals.ts";
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
+
+gsapInit();
 
 // Create a new router instance
 const router = createRouter({
