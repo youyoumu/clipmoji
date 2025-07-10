@@ -1,18 +1,22 @@
+import { useGSAP } from "@gsap/react";
 import {
   addToast,
   Card,
   CardBody,
   CardHeader,
+  cn,
   Image,
   Input,
 } from "@heroui/react";
 import { Chip } from "@heroui/react";
 import { IconCopy, IconPhotoX } from "@tabler/icons-react";
-import { memo, useEffect, useState } from "react";
+import { Observer } from "gsap/Observer";
+import { memo, useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
 
 import { useCachedBlob } from "#/hooks/useCachedBlob";
 import type { FavGif } from "#/lib/db";
+import { horizontalLoop } from "#/lib/gsap/horizontalLoop";
 
 function GifCard_({ favGif }: { favGif: FavGif }) {
   const { data: blob } = useCachedBlob(favGif.src);
@@ -35,9 +39,13 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
             onClick={onCopyClick}
           />
         </div>
-        <div className="text-default-500 text-xs truncate max-w-full">
-          {favGif.key}
-        </div>
+        <ScrollingText
+          text={favGif.key}
+          key={Math.random()}
+          classNames={{
+            text: "text-default-500 text-xs",
+          }}
+        />
         <Input
           size="sm"
           variant="underlined"
@@ -106,3 +114,74 @@ function ReactPlayerDelayed({ url }: { url: string }) {
 
 const GifCard = memo(GifCard_);
 export default GifCard;
+
+export function ScrollingText({
+  text,
+  classNames = {
+    text: "",
+  },
+}: {
+  text: string;
+  classNames?: {
+    text: string;
+  };
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    const container = containerRef.current;
+    const textEl = textRef.current;
+    if (!container || !textEl) return;
+
+    const clones: HTMLDivElement[] = [];
+    for (let i = 0; i < 5; i++) {
+      const clone = textEl.cloneNode(true) as HTMLDivElement;
+      container.appendChild(clone);
+      clones.push(clone);
+    }
+
+    const tl = horizontalLoop([textEl, ...clones], {
+      repeat: -1,
+      speed: 0.3,
+    });
+
+    Observer.create({
+      onChangeY(self) {
+        let factor = 1.5;
+        if (self.deltaY < 0) {
+          factor *= -1;
+        }
+        gsap
+          .timeline({
+            defaults: {
+              ease: "none",
+            },
+          })
+          .to(tl, { timeScale: factor * 2.5, duration: 0.2, overwrite: true })
+          .to(tl, { timeScale: factor / 2.5, duration: 1 }, "+=0.3");
+      },
+    });
+
+    return () => {
+      // Cleanup the clone and timeline
+      tl.kill();
+      for (const clone of clones) {
+        if (clone.parentElement === container) {
+          container.removeChild(clone);
+        }
+      }
+    };
+  });
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative overflow-hidden whitespace-nowrap max-w-full w-full"
+    >
+      <div ref={textRef} className={cn("inline-block pe-2", classNames.text)}>
+        {text}
+      </div>
+    </div>
+  );
+}
