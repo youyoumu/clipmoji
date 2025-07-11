@@ -1,4 +1,4 @@
-import { useVirtualizer } from "@tanstack/react-virtual";
+import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { sort } from "fast-sort";
 import { motion, useScroll, useSpring, useTransform } from "motion/react";
 import { useRef } from "react";
@@ -38,9 +38,8 @@ function RootPage_() {
     return 4;
   })();
 
-  const rowVirtualizer = useVirtualizer({
+  const rowVirtualizer = useWindowVirtualizer({
     count: sortedFavoriteGifs.length,
-    getScrollElement: () => parentRef.current,
     estimateSize: (i) => 200,
     gap: 12,
     overscan: 5,
@@ -74,15 +73,12 @@ function RootPage_() {
   }); // apply easing to the negative scroll value
 
   return (
-    <div
-      ref={parentRef}
-      className="w-full flex flex-col overflow-auto items-center p-4 basis-full"
-    >
+    <div className="w-full items-center p-4 min-h-[calc(100svh-65px)]">
       <motion.div
-        className="w-full relative max-w-7xl"
+        className="w-full relative max-w-7xl mx-auto"
         style={{
-          // height: `${rowVirtualizer.getTotalSize()}px`,
-          y: spring, // translateY of scroll container using negative scroll value
+          height: `${rowVirtualizer.getTotalSize()}px`,
+          // y: spring, // translateY of scroll container using negative scroll value
         }}
       >
         {rowVirtualizer.getVirtualItems().map((virtualRow) => {
