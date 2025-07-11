@@ -1,7 +1,5 @@
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { sort } from "fast-sort";
-import { motion, useScroll, useSpring, useTransform } from "motion/react";
-import { useRef } from "react";
 
 import {
   useFavoriteGifs,
@@ -30,7 +28,6 @@ function RootPage_() {
   const sortedFavoriteGifs = sort(favoriteGifs).desc((item) => item.order);
   const { current } = useTailwindBreakpoints();
 
-  const parentRef = useRef<HTMLDivElement>(null);
   const lanes = (() => {
     if (current === "xs") return 1;
     else if (current === "sm") return 2;
@@ -42,7 +39,7 @@ function RootPage_() {
     count: sortedFavoriteGifs.length,
     estimateSize: (i) => 200,
     gap: 12,
-    overscan: 5,
+    overscan: 0,
     lanes: lanes,
     //NOTE: https://github.com/TanStack/virtual/issues/659
     measureElement: (element, _entry, instance) => {
@@ -59,22 +56,9 @@ function RootPage_() {
     },
   });
 
-  const pageHeight = rowVirtualizer.getTotalSize();
-
-  const { scrollY } = useScroll({
-    container: parentRef,
-  }); // measures how many pixels user has scrolled vertically
-
-  const transform = useTransform(scrollY, [0, pageHeight], [0, -pageHeight]);
-  const spring = useSpring(transform, {
-    damping: 9,
-    mass: 0.3,
-    stiffness: 50,
-  }); // apply easing to the negative scroll value
-
   return (
     <div className="w-full items-center p-4 min-h-[calc(100svh-65px)]">
-      <motion.div
+      <div
         className="w-full relative max-w-7xl mx-auto"
         style={{
           height: `${rowVirtualizer.getTotalSize()}px`,
@@ -103,7 +87,7 @@ function RootPage_() {
             </div>
           );
         })}
-      </motion.div>
+      </div>
     </div>
   );
 }
