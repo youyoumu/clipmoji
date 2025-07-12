@@ -5,6 +5,7 @@ import { ToastProvider } from "@heroui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
+import { createPortal } from "react-dom";
 import ReactDOM from "react-dom/client";
 
 import { gsapInit } from "#/lib/gsap";
@@ -48,7 +49,7 @@ if (rootElement && !rootElement.innerHTML) {
     <StrictMode>
       <HeroUIProvider>
         <QueryClientProvider client={queryClient}>
-          <ToastProvider />
+          {createPortal(<ToastProvider />, document.querySelector("body")!)}
           <RouterProvider router={router} />
         </QueryClientProvider>
       </HeroUIProvider>

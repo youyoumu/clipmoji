@@ -40,7 +40,7 @@ export default function SettingsButton() {
     addToast({
       title: "Fetching...",
       color: "default",
-      timeout: 1000,
+      timeout: 20000,
     });
   }
 

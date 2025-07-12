@@ -1,6 +1,7 @@
 import { useGSAP } from "@gsap/react";
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { createPortal } from "react-dom";
 
 import { useSettings } from "#/hooks/useSettings";
 
@@ -25,10 +26,14 @@ function Component() {
       document.documentElement.classList.remove("scrollbar-hide");
     }
   }, [smoothScroll]);
+
   return (
     <>
       <Outlet />
-      <TanStackRouterDevtools />
+      {createPortal(
+        <TanStackRouterDevtools />,
+        document.querySelector("body")!,
+      )}
     </>
   );
 }
