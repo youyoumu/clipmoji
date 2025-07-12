@@ -3,13 +3,12 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 const defaultSettings = {
   overwriteFavoriteGifs: false,
   showDeadLinks: false,
+  smoothScroll: true,
 };
 
 export function useSettings() {
-  const [settings, setSettings] = useLocalStorage<typeof defaultSettings>(
+  return useLocalStorage<Partial<typeof defaultSettings>>(
     "settings",
     defaultSettings,
   );
-
-  return { settings, setSettings };
 }

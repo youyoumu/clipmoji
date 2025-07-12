@@ -11,19 +11,17 @@ import { useTailwindBreakpoints } from "#/hooks/useTailwindBreakPoints";
 import GifCard from "./GifCard";
 
 export function RootPage() {
-  const { settings } = useSettings();
+  const [{ showDeadLinks }] = useSettings();
   //remount the page when this settings change
-  return <RootPage_ key={settings.showDeadLinks.toString()} />;
+  return <RootPage_ key={showDeadLinks?.toString()} />;
 }
 
 function RootPage_() {
   const { data: allFavoriteGifs = [] } = useFavoriteGifs();
   const { data: favoriteGifsWithBlob = [] } = useFavoriteGifsWithBlob();
-  const { settings } = useSettings();
+  const [{ showDeadLinks }] = useSettings();
 
-  const favoriteGifs = settings.showDeadLinks
-    ? allFavoriteGifs
-    : favoriteGifsWithBlob;
+  const favoriteGifs = showDeadLinks ? allFavoriteGifs : favoriteGifsWithBlob;
 
   const sortedFavoriteGifs = sort(favoriteGifs).desc((item) => item.order);
   const { current } = useTailwindBreakpoints();

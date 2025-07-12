@@ -30,7 +30,7 @@ iframe.remove();
 
 export default function SettingsButton() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const { settings, setSettings } = useSettings();
+  const [settings, setSettings] = useSettings();
 
   function onTestClick() {
     addToast({
@@ -61,34 +61,18 @@ export default function SettingsButton() {
               <ModalBody>
                 <APIKeyInput />
                 <div className="flex py-2 px-1 flex-col gap-4">
-                  <Checkbox
-                    classNames={{
-                      label: "text-small",
-                    }}
-                    isSelected={settings.overwriteFavoriteGifs}
-                    onValueChange={(value) => {
-                      setSettings({
-                        ...settings,
-                        overwriteFavoriteGifs: value,
-                      });
-                    }}
-                  >
-                    Overwrite favorite GIFs
-                  </Checkbox>
-                  <Checkbox
-                    classNames={{
-                      label: "text-small",
-                    }}
-                    isSelected={settings.showDeadLinks}
-                    onValueChange={(value) => {
-                      setSettings({
-                        ...settings,
-                        showDeadLinks: value,
-                      });
-                    }}
-                  >
-                    Show dead links
-                  </Checkbox>
+                  <CheckboxSetting
+                    settingKey="overwriteFavoriteGifs"
+                    text="Overwrite favorite GIFs"
+                  />
+                  <CheckboxSetting
+                    settingKey="showDeadLinks"
+                    text="Show dead links"
+                  />
+                  <CheckboxSetting
+                    settingKey="smoothScroll"
+                    text="Smooth scrolling"
+                  />
                 </div>
               </ModalBody>
               <ModalFooter>
@@ -106,6 +90,33 @@ export default function SettingsButton() {
         </ModalContent>
       </Modal>
     </>
+  );
+}
+
+function CheckboxSetting({
+  settingKey,
+  text,
+}: {
+  settingKey: keyof ReturnType<typeof useSettings>[0];
+  text: string;
+}) {
+  const [settings, setSettings] = useSettings();
+  return (
+    <Checkbox
+      classNames={{
+        label: "text-small",
+      }}
+      isSelected={settings[settingKey]}
+      onValueChange={(value) => {
+        if (typeof settings[settingKey] !== "boolean") return;
+        setSettings({
+          ...settings,
+          [settingKey]: value,
+        });
+      }}
+    >
+      {text}
+    </Checkbox>
   );
 }
 
@@ -135,7 +146,7 @@ function APIKeyInput() {
 }
 
 function ImportButton() {
-  const { settings } = useSettings();
+  const [settings] = useSettings();
   const { mutateAsync: importGifs, isPending } = useImportFavGifs();
 
   const onImportClick = async () => {
