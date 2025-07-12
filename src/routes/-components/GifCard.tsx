@@ -83,7 +83,12 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
             {(() => {
               if (!blob)
                 return (
-                  <div className="w-full h-32 flex flex-col items-center justify-center">
+                  <div
+                    className="w-full flex flex-col items-center justify-center"
+                    style={{
+                      aspectRatio: `${favGif.width / favGif.height}`,
+                    }}
+                  >
                     <IconPhotoX className="size-12 text-content3" />
                   </div>
                 );
@@ -98,11 +103,22 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
                     classNames={{
                       img: "w-full",
                     }}
+                    style={{
+                      aspectRatio: `${favGif.width / favGif.height}`,
+                    }}
                   />
                 );
               }
               if (blob.type === "video/mp4") {
-                return <ReactPlayerDelayed url={blobUrl} />;
+                return (
+                  <div
+                    style={{
+                      aspectRatio: `${favGif.width / favGif.height}`,
+                    }}
+                  >
+                    <ReactPlayerDelayed url={blobUrl} />
+                  </div>
+                );
               }
             })()}
           </CardBody>
@@ -120,10 +136,30 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
           <div className="flex justify-between w-full">
             <Chip size="sm">{favGif.type}</Chip>
           </div>
+          <ScrollingText
+            text={favGif.key}
+            key={Math.random()}
+            classNames={{
+              text: "text-default-500 text-xs",
+            }}
+          />
+          <Input
+            size="sm"
+            variant="underlined"
+            label="Note"
+            classNames={{
+              label: "text-xs",
+            }}
+          />
         </CardHeader>
         <CardBody className="py-2">
-          <div className="w-full h-32 flex flex-col items-center justify-center">
-            <Spinner />
+          <div
+            className="w-full flex flex-col items-center justify-center"
+            style={{
+              aspectRatio: `${favGif.width / favGif.height}`,
+            }}
+          >
+            <Spinner size="lg" />
           </div>
         </CardBody>
       </Card>
