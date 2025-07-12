@@ -1,5 +1,8 @@
+import { Input } from "@heroui/react";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
+import { useDebounce } from "@uidotdev/usehooks";
 import { sort } from "fast-sort";
+import { useState, useTransition } from "react";
 
 import {
   useFavoriteGifs,
@@ -20,10 +23,18 @@ function RootPage_() {
   const { data: allFavoriteGifs = [] } = useFavoriteGifs();
   const { data: favoriteGifsWithBlob = [] } = useFavoriteGifsWithBlob();
   const [{ showDeadLinks }] = useSettings();
+  const [search, setSearch] = useState("");
+  const [isLoading, startTransition] = useTransition();
 
   const favoriteGifs = showDeadLinks ? allFavoriteGifs : favoriteGifsWithBlob;
+  const filteredFavoriteGifs = favoriteGifs.filter((favGif) => {
+    if (!search) return true;
+    return favGif.key.toLowerCase().includes(search.toLowerCase());
+  });
 
-  const sortedFavoriteGifs = sort(favoriteGifs).desc((item) => item.order);
+  const sortedFavoriteGifs = sort(filteredFavoriteGifs).desc(
+    (item) => item.order,
+  );
   const { current } = useTailwindBreakpoints();
 
   const lanes = (() => {
@@ -57,6 +68,15 @@ function RootPage_() {
 
   return (
     <div className="w-full items-center p-4 min-h-[calc(100svh-65px)]">
+      <Input
+        className=" max-w-7xl mx-auto mb-4 px-8"
+        label="Search"
+        onValueChange={(value) => {
+          startTransition(() => {
+            setSearch(value);
+          });
+        }}
+      />
       <div
         className="w-full relative max-w-7xl mx-auto"
         style={{
