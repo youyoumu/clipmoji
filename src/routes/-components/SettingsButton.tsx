@@ -1,4 +1,6 @@
 import {
+  Accordion,
+  AccordionItem,
   addToast,
   Button,
   Checkbox,
@@ -11,6 +13,7 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
+import { IconCopy, IconPhotoX } from "@tabler/icons-react";
 import { useLocalStorage, useToggle } from "@uidotdev/usehooks";
 import type { ReactNode } from "react";
 
@@ -20,18 +23,8 @@ import {
   useUpdateFavoriteGifs,
 } from "#/hooks/useFavoriteGifs";
 import { useSettings } from "#/hooks/useSettings";
-
-/*
-const iframe = document.createElement("iframe");
-console.log(
-  "Token: %c%s",
-  "font-size:16px;",
-  JSON.parse(
-    document.body.appendChild(iframe).contentWindow.localStorage.token,
-  ),
-);
-iframe.remove();
-*/
+import getApiKeyCode from "#/script/shiki/getApiKey.code.js?raw";
+import getApiKeyHtml from "#/shiki-output/getApiKey.code.js.html?raw";
 
 export default function SettingsButton({
   renderTrigger,
@@ -45,7 +38,7 @@ export default function SettingsButton({
     addToast({
       title: "Fetching...",
       color: "default",
-      timeout: 20000,
+      timeout: 1000,
     });
   }
 
@@ -70,6 +63,39 @@ export default function SettingsButton({
               </ModalHeader>
               <ModalBody>
                 <APIKeyInput />
+                <Accordion>
+                  <AccordionItem
+                    key="1"
+                    aria-label="What is API key?"
+                    title="What is API key?"
+                  >
+                    lorem ipsum dolor
+                    <div className="relative">
+                      <div
+                        className="[&_.shiki]:overflow-auto [&_.shiki]:p-4 [&_.shiki]:text-sm rounded-md overflow-hidden"
+                        dangerouslySetInnerHTML={{
+                          __html: getApiKeyHtml,
+                        }}
+                      ></div>
+                      <IconCopy
+                        className="absolute top-4 right-4 cursor-pointer"
+                        onClick={() => {
+                          navigator.clipboard.writeText(getApiKeyCode);
+                          addToast({
+                            title: "Copied to clipboard",
+                            description: (
+                              <span className="text-xs">{getApiKeyCode}</span>
+                            ),
+                            color: "default",
+                            classNames: {
+                              content: "overflow-hidden",
+                            },
+                          });
+                        }}
+                      />
+                    </div>
+                  </AccordionItem>
+                </Accordion>
                 <div className="flex py-2 px-1 flex-col gap-4">
                   <CheckboxSetting
                     settingKey="overwriteFavoriteGifs"
@@ -84,14 +110,12 @@ export default function SettingsButton({
                     text="Smooth scrolling"
                   />
                 </div>
-              </ModalBody>
-              <ModalFooter>
+
                 <Button variant="flat" onPress={onTestClick}>
                   Test
                 </Button>
-                <Button color="danger" variant="flat" onPress={onClose}>
-                  Close
-                </Button>
+              </ModalBody>
+              <ModalFooter className="flex-wrap">
                 <ExportButton />
                 <ImportButton />
               </ModalFooter>
