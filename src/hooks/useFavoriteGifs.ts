@@ -1,8 +1,8 @@
-import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
+import { queryOptions, useQuery } from "@tanstack/react-query";
 
 import { db } from "#/lib/db";
 
-import { cachedBlobQueryOptions } from "./useCachedBlob";
+import { useCachedBlobs } from "./useCachedBlob";
 import { useFavGifNotes } from "./useFavGifNote";
 
 export const favGifsQueryOptions = queryOptions({
@@ -12,43 +12,31 @@ export const favGifsQueryOptions = queryOptions({
   },
 });
 
-export function useFavoriteGifs() {
+export function useFavoriteGifs({
+  withCacheBlob,
+}: {
+  withCacheBlob?: boolean;
+} = {}) {
   const { data: favGifNotes = [], isLoading: L1 } = useFavGifNotes();
+  const { data: cachedBlobs = [] } = useCachedBlobs();
 
   return useQuery({
     ...favGifsQueryOptions,
+
     select(favGifs) {
-      return favGifs.map((favGif) => {
+      const favGifsWithNote = favGifs.map((favGif) => {
         const favGifNote = favGifNotes.find((item) => item.key === favGif.key);
         return Object.assign(favGif, {
           note: favGifNote?.note ?? "",
         });
       });
-    },
-    enabled: !L1,
-  });
-}
-
-export function useFavoriteGifsWithBlob() {
-  const queryClient = useQueryClient();
-  const { data: favoriteGifs = [], isLoading: L1 } = useFavoriteGifs();
-
-  return useQuery({
-    queryKey: [],
-    async queryFn() {
-      const filtered = (
-        await Promise.all(
-          favoriteGifs.map(async (item) => {
-            const cachedBlob = await queryClient.fetchQuery(
-              cachedBlobQueryOptions({ src: item.src }),
-            );
-
-            return cachedBlob ? item : null;
-          }),
-        )
-      ).filter((item) => !!item);
-
-      return filtered;
+      if (!withCacheBlob) return favGifsWithNote;
+      return favGifsWithNote.filter((favGif) => {
+        const cachedBlob = cachedBlobs.find(
+          (item) => item.src === favGif.src,
+        )?.blob;
+        return !!cachedBlob;
+      });
     },
     enabled: !L1,
   });

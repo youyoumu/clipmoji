@@ -31,7 +31,7 @@ import { horizontalLoop } from "#/lib/gsap/horizontalLoop";
 const reactNodeCache = new Map<string, ReactNode>();
 
 function GifCard_({ favGif }: { favGif: FavGif }) {
-  const { data: blob, isLoading: L1 } = useCachedBlob(favGif.src);
+  const { data: cachedBlob, isLoading: L1 } = useCachedBlob(favGif.src);
   const [isLoading, startTransition] = useTransition();
 
   const onCopyClick = useCallback(() => {
@@ -76,7 +76,7 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
           </CardHeader>
           <CardBody className="py-2">
             {(() => {
-              if (!blob)
+              if (!cachedBlob?.blob)
                 return (
                   <div
                     className="w-full flex flex-col items-center justify-center"
@@ -87,8 +87,8 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
                     <IconPhotoX className="size-12 text-content3" />
                   </div>
                 );
-              const blobUrl = URL.createObjectURL(blob);
-              if (blob.type === "image/gif") {
+              const blobUrl = URL.createObjectURL(cachedBlob.blob);
+              if (cachedBlob.blob.type === "image/gif") {
                 return (
                   <Image
                     alt="Card background"
@@ -104,7 +104,7 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
                   />
                 );
               }
-              if (blob.type === "video/mp4") {
+              if (cachedBlob.blob.type === "video/mp4") {
                 return (
                   <div
                     style={{
@@ -122,7 +122,7 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
       reactNodeCache.set(favGif.id.toString(), node);
       setCardNode(node);
     });
-  }, [blob, L1]);
+  }, [cachedBlob, L1]);
 
   if (!cardNode)
     return (

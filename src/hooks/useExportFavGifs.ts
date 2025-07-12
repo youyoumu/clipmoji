@@ -1,13 +1,13 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { format } from "date-fns";
 import JSZip from "jszip";
 
-import { cachedBlobQueryOptions } from "./useCachedBlob";
+import { useCachedBlobs } from "./useCachedBlob";
 import { useFavoriteGifs } from "./useFavoriteGifs";
 
 export function useExportFavGifs() {
   const { data: favoriteGifs = [] } = useFavoriteGifs();
-  const queryClient = useQueryClient();
+  const { data: cachedBlobs = [] } = useCachedBlobs();
 
   return useMutation({
     async mutationFn() {
@@ -15,9 +15,8 @@ export function useExportFavGifs() {
       const folder = zip.folder("favorite-gifs");
       if (!folder) return;
       for (const gif of favoriteGifs) {
-        const blob = await queryClient.fetchQuery(
-          cachedBlobQueryOptions({ src: gif.src }),
-        );
+        const blob =
+          cachedBlobs.find((item) => item.src === gif.src)?.blob ?? null;
         const content = blob ? blob : JSON.stringify(gif);
         const filename = (() => {
           let filename = gif.key;

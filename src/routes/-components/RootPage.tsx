@@ -4,10 +4,7 @@ import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { sort } from "fast-sort";
 import { useState, useTransition } from "react";
 
-import {
-  useFavoriteGifs,
-  useFavoriteGifsWithBlob,
-} from "#/hooks/useFavoriteGifs";
+import { useFavoriteGifs } from "#/hooks/useFavoriteGifs";
 import { useSettings } from "#/hooks/useSettings";
 import { useTailwindBreakpoints } from "#/hooks/useTailwindBreakPoints";
 
@@ -20,13 +17,13 @@ export function RootPage() {
 }
 
 function RootPage_() {
-  const { data: allFavoriteGifs = [] } = useFavoriteGifs();
-  const { data: favoriteGifsWithBlob = [] } = useFavoriteGifsWithBlob();
   const [{ showDeadLinks }] = useSettings();
+
+  const { data: favoriteGifs = [] } = useFavoriteGifs({
+    withCacheBlob: !showDeadLinks,
+  });
   const [search, setSearch] = useState("");
   const [isLoading, startTransition] = useTransition();
-
-  const favoriteGifs = showDeadLinks ? allFavoriteGifs : favoriteGifsWithBlob;
 
   const haystack = favoriteGifs.map((favGif) => favGif.key + " " + favGif.note);
   const uf = new uFuzzy({});

@@ -1,4 +1,9 @@
-import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
+import {
+  queryOptions,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 import { db } from "#/lib/db";
 
@@ -26,6 +31,7 @@ export function useFavGifNotes() {
 }
 
 export function useUpdateFavGifNote() {
+  const queryClient = useQueryClient();
   return useMutation({
     async mutationFn({ key, note }: { key: string; note: string }) {
       let updated = false;
@@ -48,6 +54,11 @@ export function useUpdateFavGifNote() {
         updated,
         note,
       };
+    },
+    onSuccess() {
+      queryClient.invalidateQueries({
+        queryKey: ["favGifNote"],
+      });
     },
   });
 }

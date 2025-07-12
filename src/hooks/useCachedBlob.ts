@@ -5,7 +5,7 @@ import { db } from "#/lib/db";
 
 export const cachedBlobQueryOptions = ({ src }: { src: string }) =>
   queryOptions({
-    queryKey: ["cachedBlob", { src }],
+    queryKey: ["cachedBlobs", { src }],
     async queryFn() {
       const cachedBlob = await db.cachedBlob.where("src").equals(src).first();
       if (cachedBlob) return cachedBlob.blob;
@@ -68,6 +68,18 @@ export const cachedBlobQueryOptions = ({ src }: { src: string }) =>
 
 export function useCachedBlob(src: string) {
   return useQuery({
-    ...cachedBlobQueryOptions({ src }),
+    queryKey: ["cachedBlobs", { src }],
+    async queryFn() {
+      return await db.cachedBlob.get({ src });
+    },
+  });
+}
+
+export function useCachedBlobs() {
+  return useQuery({
+    queryKey: ["cachedBlobs"],
+    async queryFn() {
+      return await db.cachedBlob.toArray();
+    },
   });
 }
