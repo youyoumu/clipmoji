@@ -13,10 +13,13 @@ import {
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import { useLocalStorage, useToggle } from "@uidotdev/usehooks";
 
-import { useUpdateCachedBlobs } from "#/hooks/useCachedBlob";
-import { useExportFavGifs } from "#/hooks/useExportFavGifs";
-import { useImportFavGifs } from "#/hooks/useImportFavGifs";
+import { useUpdateCachedBlobs } from "#/hooks/useCachedBlobs";
+import {
+  useExportFavoriteGifs,
+  useUpdateFavoriteGifs,
+} from "#/hooks/useFavoriteGifs";
 import { useSettings } from "#/hooks/useSettings";
+
 /*
 const iframe = document.createElement("iframe");
 console.log(
@@ -158,7 +161,7 @@ function APIKeyInput() {
 
 function ImportButton() {
   const [settings] = useSettings();
-  const { mutateAsync: importGifs, isPending } = useImportFavGifs();
+  const { mutateAsync: importGifs, isPending } = useUpdateFavoriteGifs();
 
   const onImportClick = async () => {
     addToast({
@@ -200,7 +203,7 @@ function ImportButton() {
 }
 
 function ExportButton() {
-  const { mutateAsync: exportGifs, isPending } = useExportFavGifs();
+  const { mutateAsync: exportGifs, isPending } = useExportFavoriteGifs();
 
   function onExportClick() {
     addToast({

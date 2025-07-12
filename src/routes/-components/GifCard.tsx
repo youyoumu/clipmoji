@@ -23,8 +23,8 @@ import {
 } from "react";
 import ReactPlayer from "react-player";
 
-import { useCachedBlob } from "#/hooks/useCachedBlob";
-import { useFavGifNote, useUpdateFavGifNote } from "#/hooks/useFavGifNote";
+import { useCachedBlob } from "#/hooks/useCachedBlobs";
+import { useFavGifNote, useUpdateFavGifNote } from "#/hooks/useFavGifNotes";
 import type { FavGif } from "#/lib/db";
 import { horizontalLoop } from "#/lib/gsap/horizontalLoop";
 
