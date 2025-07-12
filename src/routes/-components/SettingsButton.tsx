@@ -12,6 +12,7 @@ import {
 } from "@heroui/react";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import { useLocalStorage, useToggle } from "@uidotdev/usehooks";
+import type { ReactNode } from "react";
 
 import { useUpdateCachedBlobs } from "#/hooks/useCachedBlobs";
 import {
@@ -32,7 +33,11 @@ console.log(
 iframe.remove();
 */
 
-export default function SettingsButton() {
+export default function SettingsButton({
+  renderTrigger,
+}: {
+  renderTrigger?: (onOpen: () => void) => ReactNode;
+}) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [settings, setSettings] = useSettings();
 
@@ -46,12 +51,14 @@ export default function SettingsButton() {
 
   return (
     <>
-      <Button color="primary" variant="flat" onPress={onOpen}>
-        Settings
-      </Button>
+      {renderTrigger?.(onOpen) ?? (
+        <Button color="primary" variant="flat" onPress={onOpen}>
+          Settings
+        </Button>
+      )}
       <Modal
         isOpen={isOpen}
-        placement="top-center"
+        placement="center"
         onOpenChange={onOpenChange}
         size="2xl"
       >

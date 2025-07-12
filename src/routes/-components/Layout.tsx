@@ -16,19 +16,6 @@ import SettingsButton from "./SettingsButton";
 export default function Layout({ children }: { children: ReactNode }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const menuItems = [
-    "Profile",
-    "Dashboard",
-    "Activity",
-    "Analytics",
-    "System",
-    "Deployments",
-    "My Settings",
-    "Team Settings",
-    "Help & Feedback",
-    "Log Out",
-  ];
-
   return (
     <>
       <Navbar onMenuOpenChange={setIsMenuOpen} isBordered>
@@ -42,53 +29,25 @@ export default function Layout({ children }: { children: ReactNode }) {
           </NavbarBrand>
         </NavbarContent>
         <NavbarMenu>
-          {menuItems.map((item, index) => (
-            <NavbarMenuItem key={`${item}-${index}`}>
-              <Link
-                className="w-full"
-                color={
-                  index === 2
-                    ? "primary"
-                    : index === menuItems.length - 1
-                      ? "danger"
-                      : "foreground"
-                }
-                href="#"
-                size="lg"
-              >
-                {item}
-              </Link>
-            </NavbarMenuItem>
-          ))}
+          <NavbarMenuItem>
+            <SettingsButton
+              renderTrigger={(onOpen) => {
+                return (
+                  <Button onPress={onOpen} variant="light" color="primary">
+                    Settings
+                  </Button>
+                );
+              }}
+            />
+          </NavbarMenuItem>
         </NavbarMenu>
 
-        <NavbarContent className="hidden sm:flex gap-4" justify="center">
-          <NavbarItem>
-            <Link color="foreground" href="#">
-              Features
-            </Link>
-          </NavbarItem>
-          <NavbarItem isActive>
-            <Link aria-current="page" href="#">
-              Customers
-            </Link>
-          </NavbarItem>
-          <NavbarItem>
-            <Link color="foreground" href="#">
-              Integrations
-            </Link>
-          </NavbarItem>
-        </NavbarContent>
+        <NavbarContent
+          className="hidden sm:flex gap-4"
+          justify="center"
+        ></NavbarContent>
         <NavbarContent justify="end">
-          <NavbarItem className="hidden lg:flex">
-            <Link href="#">Login</Link>
-          </NavbarItem>
-          <NavbarItem>
-            <Button as={Link} color="primary" href="#" variant="flat">
-              Sign Up
-            </Button>
-          </NavbarItem>
-          <NavbarItem>
+          <NavbarItem className="hidden sm:block">
             <SettingsButton />
           </NavbarItem>
         </NavbarContent>
