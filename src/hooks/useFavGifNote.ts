@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
 
 import { db } from "#/lib/db";
 
@@ -9,6 +9,19 @@ export function useFavGifNote({ key }: { key: string }) {
       const favGifNote = await db.favGifNote.get({ key });
       return favGifNote ?? null;
     },
+  });
+}
+
+export const favGifNotesOptions = queryOptions({
+  queryKey: ["favGifNote"],
+  async queryFn() {
+    return await db.favGifNote.toArray();
+  },
+});
+
+export function useFavGifNotes() {
+  return useQuery({
+    ...favGifNotesOptions,
   });
 }
 

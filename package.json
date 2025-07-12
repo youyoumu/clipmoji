@@ -17,6 +17,7 @@
     "@heroui/react": "^2.7.11",
     "@heroui/system": "^2.4.18",
     "@heroui/theme": "^2.4.17",
+    "@leeoniya/ufuzzy": "^1.0.18",
     "@tabler/icons-react": "^3.34.0",
     "@tanstack/react-query": "^5.81.5",
     "@tanstack/react-router": "^1.121.2",

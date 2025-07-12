@@ -1,6 +1,6 @@
 import { Input } from "@heroui/react";
+import uFuzzy from "@leeoniya/ufuzzy";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
-import { useDebounce } from "@uidotdev/usehooks";
 import { sort } from "fast-sort";
 import { useState, useTransition } from "react";
 
@@ -27,9 +27,14 @@ function RootPage_() {
   const [isLoading, startTransition] = useTransition();
 
   const favoriteGifs = showDeadLinks ? allFavoriteGifs : favoriteGifsWithBlob;
-  const filteredFavoriteGifs = favoriteGifs.filter((favGif) => {
-    if (!search) return true;
-    return favGif.key.toLowerCase().includes(search.toLowerCase());
+
+  const haystack = favoriteGifs.map((favGif) => favGif.key + " " + favGif.note);
+  const uf = new uFuzzy({});
+  const filteredIndexes = uf.filter(haystack, search);
+
+  const filteredFavoriteGifs = favoriteGifs.filter((favGif, i) => {
+    if (!filteredIndexes) return true;
+    return filteredIndexes.includes(i);
   });
 
   const sortedFavoriteGifs = sort(filteredFavoriteGifs).desc(
