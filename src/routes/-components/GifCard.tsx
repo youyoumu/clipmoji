@@ -42,8 +42,13 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
     navigator.clipboard.writeText(favGif.key);
     addToast({
       title: "Copied to clipboard",
-      description: favGif.key,
+      description: (
+        <ScrollingText text={favGif.key} classNames={{ text: "text-xs" }} />
+      ),
       color: "primary",
+      classNames: {
+        content: "overflow-hidden",
+      },
     });
   }, [favGif.key]);
 
