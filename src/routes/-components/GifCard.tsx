@@ -45,7 +45,7 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
       description: favGif.key,
       color: "primary",
     });
-  }, []);
+  }, [favGif.key]);
 
   const { mutate: updateGifCardNodeCache } = useUpdateGifCardNodeCache();
 
@@ -54,7 +54,7 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
 
     startTransition(() => {
       const node = (
-        <Card className="py-4">
+        <Card className="py-4" key={favGif.id}>
           <CardHeader className="pb-0 pt-0 flex-col items-start gap-2 overflow-hidden">
             <div className="flex justify-between w-full">
               <Chip size="sm">{favGif.type}</Chip>
@@ -65,7 +65,6 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
             </div>
             <ScrollingText
               text={favGif.key}
-              key={Math.random()}
               classNames={{
                 text: "text-default-500 text-xs",
               }}
@@ -119,7 +118,7 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
       );
       updateGifCardNodeCache({ id: favGif.id.toString(), node });
     });
-  }, [cachedBlob, L1]);
+  }, [cachedBlob, L1, favGif, onCopyClick, updateGifCardNodeCache]);
 
   if (!cardNode)
     return (
@@ -173,15 +172,13 @@ function NoteInput({ favGif }: { favGif: FavGif }) {
           note: note,
         },
         {
-          onSuccess({ updated, note }) {
-            if (updated) {
-              addToast({
-                title: "Note Updated",
-                description: `Your note has been updated: ${note}`,
-                color: "secondary",
-                timeout: 2000,
-              });
-            }
+          onSuccess({ note }) {
+            addToast({
+              title: "Note Updated",
+              description: `Your note has been updated: ${note}`,
+              color: "secondary",
+              timeout: 2000,
+            });
           },
         },
       );

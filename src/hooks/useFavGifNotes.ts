@@ -34,14 +34,12 @@ export function useUpdateFavGifNote() {
   const queryClient = useQueryClient();
   return useMutation({
     async mutationFn({ key, note }: { key: string; note: string }) {
-      let updated = false;
       const favGifNote = await db.favGifNote.get({ key });
       if (favGifNote) {
         if (note !== favGifNote.note) {
           db.favGifNote.update(favGifNote.id, {
             note,
           });
-          updated = true;
         }
       } else {
         db.favGifNote.add({
@@ -51,7 +49,6 @@ export function useUpdateFavGifNote() {
       }
 
       return {
-        updated,
         note,
       };
     },
