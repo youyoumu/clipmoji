@@ -53,27 +53,35 @@ export function useImportFavGifs() {
       ) as unknown as FrecentyUserSettings;
       const favoriteGifs = Object.entries(decoded.favoriteGifs.gifs);
 
+      if (overwrite) await db.favGif.clear();
       const currentFavGifs = await db.favGif.toArray();
-      const currentFavGifKeys = currentFavGifs.map((favGiv) => favGiv.key);
 
-      const filteredFavGif = favoriteGifs.filter(
-        ([key]) => !currentFavGifKeys.includes(key),
-      );
-
-      for (const [key, value] of filteredFavGif) {
-        await db.favGif.add({
+      let addedCount = 0;
+      let updatedCount = 0;
+      for (const [key, value] of favoriteGifs) {
+        const payload = {
           key: key,
           src: value.src,
           order: value.order,
           type: value.format === 1 ? "gif" : "mp4",
           height: value.height,
           width: value.width,
-        });
+        } as const;
+
+        const currentFavGif = currentFavGifs.find((item) => item.key === key);
+        if (currentFavGif) {
+          await db.favGif.update(currentFavGif.id, payload);
+          updatedCount++;
+        } else {
+          await db.favGif.add(payload);
+          addedCount++;
+        }
       }
 
       return {
-        addedCount: filteredFavGif.length,
-        overwrite: true,
+        addedCount,
+        updatedCount,
+        overwrite: overwrite,
       };
     },
   });

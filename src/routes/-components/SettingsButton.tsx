@@ -13,6 +13,7 @@ import {
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import { useLocalStorage, useToggle } from "@uidotdev/usehooks";
 
+import { useUpdateCachedBlobs } from "#/hooks/useCachedBlob";
 import { useExportFavGifs } from "#/hooks/useExportFavGifs";
 import { useImportFavGifs } from "#/hooks/useImportFavGifs";
 import { useSettings } from "#/hooks/useSettings";
@@ -32,11 +33,21 @@ export default function SettingsButton() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [settings, setSettings] = useSettings();
 
+  const { mutateAsync: updateCachedBlobs } = useUpdateCachedBlobs();
+
   function onTestClick() {
     addToast({
-      title: "Import Success",
-      description: "Your favorite GIF has been imported.",
-      color: "success",
+      title: "Fetching...",
+      promise: updateCachedBlobs(undefined, {
+        onSuccess({ addedCount, errorCount }) {
+          addToast({
+            title: "Fetch Complete",
+            description: `${addedCount} favorite GIF${addedCount > 1 ? "s" : ""} has been cached locally. Failed to fetch ${errorCount} GIF${addedCount > 1 ? "s" : ""}.`,
+            color: "warning",
+          });
+        },
+      }),
+      color: "default",
       timeout: 1000,
     });
   }
@@ -155,24 +166,10 @@ function ImportButton() {
       promise: importGifs(
         { overwrite: settings.overwriteFavoriteGifs },
         {
-          onSuccess({ addedCount, overwrite }) {
-            if (addedCount === 0) {
-              addToast({
-                title: "Import Complete",
-                description:
-                  "All your favorite GIFs were already imported. No new ones were added.",
-                color: "warning",
-              });
-              return;
-            }
-
+          onSuccess({ addedCount, updatedCount, overwrite }) {
             addToast({
               title: "Import Complete",
-              description: `${addedCount} new favorite GIF${addedCount !== 1 ? "s" : ""} added successfully.${
-                overwrite
-                  ? " Some existing favorite GIFs have been overwritten."
-                  : ""
-              }`,
+              description: `${overwrite ? "Existing favorite GIFs have been overwritten." : ""} ${addedCount} added, ${updatedCount} updated.`,
               color: "success",
             });
           },
