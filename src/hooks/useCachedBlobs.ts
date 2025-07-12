@@ -1,14 +1,7 @@
-import {
-  queryOptions,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import wretch from "wretch";
 
 import { db } from "#/lib/db";
-
-import { useFavoriteGifs } from "./useFavoriteGifs";
 
 export function useCachedBlob(src: string) {
   return useQuery({
@@ -30,9 +23,9 @@ export function useCachedBlobs() {
 
 export function useUpdateCachedBlobs() {
   const queryClient = useQueryClient();
-  const { data: favGifs = [] } = useFavoriteGifs();
   return useMutation({
     async mutationFn() {
+      const favGifs = await db.favGif.toArray();
       let addedCount = 0;
       let errorCount = 0;
       for (const favGif of favGifs) {

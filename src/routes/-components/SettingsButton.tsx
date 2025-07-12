@@ -36,20 +36,9 @@ export default function SettingsButton() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [settings, setSettings] = useSettings();
 
-  const { mutateAsync: updateCachedBlobs } = useUpdateCachedBlobs();
-
   function onTestClick() {
     addToast({
       title: "Fetching...",
-      promise: updateCachedBlobs(undefined, {
-        onSuccess({ addedCount, errorCount }) {
-          addToast({
-            title: "Fetch Complete",
-            description: `${addedCount} favorite GIF${addedCount > 1 ? "s" : ""} has been cached locally. Failed to fetch ${errorCount} GIF${addedCount > 1 ? "s" : ""}.`,
-            color: "warning",
-          });
-        },
-      }),
       color: "default",
       timeout: 1000,
     });
@@ -163,6 +152,25 @@ function ImportButton() {
   const [settings] = useSettings();
   const { mutateAsync: importGifs, isPending } = useUpdateFavoriteGifs();
 
+  const { mutateAsync: updateCachedBlobs } = useUpdateCachedBlobs();
+
+  function updateCachedBlobsWithToast() {
+    addToast({
+      title: "Fetching...",
+      promise: updateCachedBlobs(undefined, {
+        onSuccess({ addedCount, errorCount }) {
+          addToast({
+            title: "Fetch Complete",
+            description: `${addedCount} favorite GIF${addedCount > 1 ? "s" : ""} has been cached locally. Failed to fetch ${errorCount} GIF${addedCount > 1 ? "s" : ""}.`,
+            color: "warning",
+          });
+        },
+      }),
+      color: "default",
+      timeout: 1000,
+    });
+  }
+
   const onImportClick = async () => {
     addToast({
       title: "Importing...",
@@ -175,6 +183,7 @@ function ImportButton() {
               description: `${overwrite ? "Existing favorite GIFs have been overwritten." : ""} ${addedCount} added, ${updatedCount} updated.`,
               color: "success",
             });
+            updateCachedBlobsWithToast();
           },
           onError() {
             addToast({
