@@ -39,7 +39,8 @@ function RootPage_() {
     count: sortedFavoriteGifs.length,
     estimateSize: (i) => 200,
     gap: 12,
-    overscan: 0,
+    overscan: 50,
+    useAnimationFrameWithResizeObserver: true,
     lanes: lanes,
     //NOTE: https://github.com/TanStack/virtual/issues/659
     measureElement: (element, _entry, instance) => {
@@ -62,7 +63,6 @@ function RootPage_() {
         className="w-full relative max-w-7xl mx-auto"
         style={{
           height: `${rowVirtualizer.getTotalSize()}px`,
-          // y: spring, // translateY of scroll container using negative scroll value
         }}
       >
         {rowVirtualizer.getVirtualItems().map((virtualRow) => {
@@ -80,10 +80,7 @@ function RootPage_() {
               }}
               ref={rowVirtualizer.measureElement}
             >
-              <GifCard
-                key={sortedFavoriteGifs[virtualRow.index].id}
-                favGif={sortedFavoriteGifs[virtualRow.index]}
-              />
+              <GifCard favGif={sortedFavoriteGifs[virtualRow.index]} />
             </div>
           );
         })}

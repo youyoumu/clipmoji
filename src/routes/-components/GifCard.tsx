@@ -9,83 +9,131 @@ import {
   Input,
 } from "@heroui/react";
 import { Chip } from "@heroui/react";
+import { Spinner } from "@heroui/react";
 import { IconCopy, IconPhotoX } from "@tabler/icons-react";
-import { memo, useEffect, useRef, useState } from "react";
+import {
+  memo,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import ReactPlayer from "react-player";
 
 import { useCachedBlob } from "#/hooks/useCachedBlob";
 import type { FavGif } from "#/lib/db";
 import { horizontalLoop } from "#/lib/gsap/horizontalLoop";
 
+const reactNodeCache = new Map<string, ReactNode>();
+
 function GifCard_({ favGif }: { favGif: FavGif }) {
-  const { data: blob } = useCachedBlob(favGif.src);
-  const onCopyClick = () => {
+  const { data: blob, isLoading: L1 } = useCachedBlob(favGif.src);
+  const [isLoading, startTransition] = useTransition();
+
+  const onCopyClick = useCallback(() => {
     navigator.clipboard.writeText(favGif.key);
     addToast({
       title: "Copied to clipboard",
       description: favGif.key,
       color: "primary",
     });
-  };
+  }, []);
 
-  return (
-    <Card className="py-4">
-      <CardHeader className="pb-0 pt-0 flex-col items-start gap-2 overflow-hidden">
-        <div className="flex justify-between w-full">
-          <Chip size="sm">{favGif.type}</Chip>
-          <IconCopy
-            className="text-content4 cursor-pointer size-6"
-            onClick={onCopyClick}
-          />
-        </div>
-        <ScrollingText
-          text={favGif.key}
-          key={Math.random()}
-          classNames={{
-            text: "text-default-500 text-xs",
-          }}
-        />
-        <Input
-          size="sm"
-          variant="underlined"
-          label="Note"
-          classNames={{
-            label: "text-xs",
-          }}
-        />
-      </CardHeader>
-      <CardBody className="overflow-visible py-2">
-        {(() => {
-          if (!blob)
-            return (
-              <div className="w-full h-32 flex flex-col items-center justify-center">
-                <IconPhotoX className="size-12 text-content3" />
-              </div>
-            );
-          const blobUrl = URL.createObjectURL(blob);
-          if (blob.type === "image/gif") {
-            return (
-              <Image
-                alt="Card background"
-                className="object-cover rounded-xl"
-                src={blobUrl}
-                width="full"
-                classNames={{
-                  img: "w-full",
-                }}
+  const [cardNode, setCardNode] = useState<ReactNode>();
+
+  useEffect(() => {
+    if (L1) return;
+    const cacheNode = reactNodeCache.get(favGif.id.toString());
+
+    startTransition(() => {
+      if (cacheNode) {
+        setCardNode(cacheNode);
+        return;
+      }
+
+      const node = (
+        <Card className="py-4">
+          <CardHeader className="pb-0 pt-0 flex-col items-start gap-2 overflow-hidden">
+            <div className="flex justify-between w-full">
+              <Chip size="sm">{favGif.type}</Chip>
+              <IconCopy
+                className="text-content4 cursor-pointer size-6"
+                onClick={onCopyClick}
               />
-            );
-          }
-          if (blob.type === "video/mp4") {
-            return <ReactPlayerDelayed url={blobUrl} />;
-          }
-        })()}
-      </CardBody>
-    </Card>
-  );
+            </div>
+            <ScrollingText
+              text={favGif.key}
+              key={Math.random()}
+              classNames={{
+                text: "text-default-500 text-xs",
+              }}
+            />
+            <Input
+              size="sm"
+              variant="underlined"
+              label="Note"
+              classNames={{
+                label: "text-xs",
+              }}
+            />
+          </CardHeader>
+          <CardBody className="py-2">
+            {(() => {
+              if (!blob)
+                return (
+                  <div className="w-full h-32 flex flex-col items-center justify-center">
+                    <IconPhotoX className="size-12 text-content3" />
+                  </div>
+                );
+              const blobUrl = URL.createObjectURL(blob);
+              if (blob.type === "image/gif") {
+                return (
+                  <Image
+                    alt="Card background"
+                    className="object-cover rounded-xl"
+                    src={blobUrl}
+                    width="full"
+                    classNames={{
+                      img: "w-full",
+                    }}
+                  />
+                );
+              }
+              if (blob.type === "video/mp4") {
+                return <ReactPlayerDelayed url={blobUrl} />;
+              }
+            })()}
+          </CardBody>
+        </Card>
+      );
+      reactNodeCache.set(favGif.id.toString(), node);
+      setCardNode(node);
+    });
+  }, [blob, L1]);
+
+  if (!cardNode)
+    return (
+      <Card className="py-4">
+        <CardHeader className="pb-0 pt-0 flex-col items-start gap-2 overflow-hidden">
+          <div className="flex justify-between w-full">
+            <Chip size="sm">{favGif.type}</Chip>
+          </div>
+        </CardHeader>
+        <CardBody className="py-2">
+          <div className="w-full h-32 flex flex-col items-center justify-center">
+            <Spinner />
+          </div>
+        </CardBody>
+      </Card>
+    );
+
+  return cardNode;
 }
 
-function ReactPlayerDelayed({ url }: { url: string }) {
+const ReactPlayerDelayed = memo(ReactPlayerDelayed_);
+function ReactPlayerDelayed_({ url }: { url: string }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -114,7 +162,8 @@ function ReactPlayerDelayed({ url }: { url: string }) {
 const GifCard = memo(GifCard_);
 export default GifCard;
 
-export function ScrollingText({
+const ScrollingText = memo(ScrollingText_);
+export function ScrollingText_({
   text,
   classNames = {
     text: "",
