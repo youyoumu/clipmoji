@@ -11,6 +11,7 @@ import {
 import { Chip } from "@heroui/react";
 import { Spinner } from "@heroui/react";
 import { IconCopy, IconPhotoX } from "@tabler/icons-react";
+import { useDebounceFn } from "ahooks";
 import {
   memo,
   type ReactNode,
@@ -23,6 +24,7 @@ import {
 import ReactPlayer from "react-player";
 
 import { useCachedBlob } from "#/hooks/useCachedBlob";
+import { useFavGifNote, useUpdateFavGifNote } from "#/hooks/useFavGifNote";
 import type { FavGif } from "#/lib/db";
 import { horizontalLoop } from "#/lib/gsap/horizontalLoop";
 
@@ -70,14 +72,7 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
                 text: "text-default-500 text-xs",
               }}
             />
-            <Input
-              size="sm"
-              variant="underlined"
-              label="Note"
-              classNames={{
-                label: "text-xs",
-              }}
-            />
+            <NoteInput favGif={favGif} />
           </CardHeader>
           <CardBody className="py-2">
             {(() => {
@@ -143,14 +138,7 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
               text: "text-default-500 text-xs",
             }}
           />
-          <Input
-            size="sm"
-            variant="underlined"
-            label="Note"
-            classNames={{
-              label: "text-xs",
-            }}
-          />
+          <NoteInput favGif={favGif} />
         </CardHeader>
         <CardBody className="py-2">
           <div
@@ -166,6 +154,62 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
     );
 
   return cardNode;
+}
+
+function NoteInput({ favGif }: { favGif: FavGif }) {
+  const [note, setNote] = useState("");
+  const { data: favGifNote } = useFavGifNote({ key: favGif.key });
+
+  useEffect(() => {
+    if (favGifNote) {
+      setNote(favGifNote.note);
+    }
+  }, [favGifNote]);
+
+  const { mutate: updateFavGifNote } = useUpdateFavGifNote();
+
+  const { run: debouncedUpdateFavGifNote } = useDebounceFn(
+    (note) => {
+      updateFavGifNote(
+        {
+          key: favGif.key,
+          note: note,
+        },
+        {
+          onSuccess({ updated, note }) {
+            if (updated) {
+              addToast({
+                title: "Note Updated",
+                description: `Your note has been updated: ${note}`,
+                color: "secondary",
+                timeout: 2000,
+              });
+            }
+          },
+        },
+      );
+    },
+    {
+      wait: 1000,
+    },
+  );
+
+  return (
+    <Input
+      size="sm"
+      variant="underlined"
+      label="Note"
+      classNames={{
+        label: "text-xs",
+      }}
+      value={note}
+      onValueChange={(value) => {
+        setNote(value);
+        debouncedUpdateFavGifNote(value);
+      }}
+      maxLength={50}
+    />
+  );
 }
 
 const ReactPlayerDelayed = memo(ReactPlayerDelayed_);
