@@ -14,7 +14,6 @@ import { IconCopy, IconPhotoX } from "@tabler/icons-react";
 import { useDebounceFn } from "ahooks";
 import {
   memo,
-  type ReactNode,
   useCallback,
   useEffect,
   useRef,
@@ -25,13 +24,18 @@ import ReactPlayer from "react-player";
 
 import { useCachedBlob } from "#/hooks/useCachedBlobs";
 import { useFavGifNote, useUpdateFavGifNote } from "#/hooks/useFavGifNotes";
+import {
+  useGifCardNodeCache,
+  useUpdateGifCardNodeCache,
+} from "#/hooks/useGifCardNodeCache";
 import type { FavGif } from "#/lib/db";
 import { horizontalLoop } from "#/lib/gsap/horizontalLoop";
 
-const reactNodeCache = new Map<string, ReactNode>();
-
 function GifCard_({ favGif }: { favGif: FavGif }) {
   const { data: cachedBlob, isLoading: L1 } = useCachedBlob(favGif.src);
+  const { data: cardNode, isLoading: L2 } = useGifCardNodeCache({
+    id: favGif.id.toString(),
+  });
   const [isLoading, startTransition] = useTransition();
 
   const onCopyClick = useCallback(() => {
@@ -43,18 +47,12 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
     });
   }, []);
 
-  const [cardNode, setCardNode] = useState<ReactNode>();
+  const { mutate: updateGifCardNodeCache } = useUpdateGifCardNodeCache();
 
   useEffect(() => {
     if (L1) return;
-    const cacheNode = reactNodeCache.get(favGif.id.toString());
 
     startTransition(() => {
-      if (cacheNode) {
-        setCardNode(cacheNode);
-        return;
-      }
-
       const node = (
         <Card className="py-4">
           <CardHeader className="pb-0 pt-0 flex-col items-start gap-2 overflow-hidden">
@@ -119,8 +117,7 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
           </CardBody>
         </Card>
       );
-      reactNodeCache.set(favGif.id.toString(), node);
-      setCardNode(node);
+      updateGifCardNodeCache({ id: favGif.id.toString(), node });
     });
   }, [cachedBlob, L1]);
 

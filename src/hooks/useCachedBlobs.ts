@@ -79,6 +79,10 @@ export function useUpdateCachedBlobs() {
       queryClient.invalidateQueries({
         queryKey: ["cachedBlobs"],
       });
+
+      queryClient.invalidateQueries({
+        queryKey: ["gifCardNodeCache"],
+      });
     },
   });
 }
