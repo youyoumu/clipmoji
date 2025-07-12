@@ -38,8 +38,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             className="sm:hidden"
           />
           <NavbarBrand>
-            <AcmeLogo />
-            <p className="font-bold text-inherit">ACME</p>
+            <div className="text-2xl font-leckerli-one">Clipmoji</div>
           </NavbarBrand>
         </NavbarContent>
         <NavbarMenu>

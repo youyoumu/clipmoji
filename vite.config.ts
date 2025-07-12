@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+import webfontDownload from "vite-plugin-webfont-dl";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -12,6 +13,9 @@ export default defineConfig({
       autoCodeSplitting: true,
     }),
     viteReact(),
+    webfontDownload([
+      "https://fonts.googleapis.com/css2?family=Leckerli+One&display=swap",
+    ]),
   ],
   resolve: {
     alias: {

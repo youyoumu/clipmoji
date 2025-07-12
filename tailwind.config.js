@@ -8,6 +8,9 @@ export default {
   ],
   theme: {
     extend: {},
+    fontFamily: {
+      "leckerli-one": ["Leckerli One", "sans-serif"],
+    },
   },
   darkMode: "class",
   plugins: [heroui()],
