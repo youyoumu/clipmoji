@@ -2,9 +2,11 @@ import {
   Accordion,
   AccordionItem,
   addToast,
+  Alert,
   Button,
   Checkbox,
   Input,
+  Kbd,
   Modal,
   ModalBody,
   ModalContent,
@@ -12,8 +14,8 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@heroui/react";
-import { IconEye, IconEyeOff } from "@tabler/icons-react";
-import { IconCopy, IconPhotoX } from "@tabler/icons-react";
+import { IconDevices, IconEye, IconEyeOff } from "@tabler/icons-react";
+import { IconCopy } from "@tabler/icons-react";
 import { useLocalStorage, useToggle } from "@uidotdev/usehooks";
 import type { ReactNode } from "react";
 
@@ -54,6 +56,7 @@ export default function SettingsButton({
         placement="center"
         onOpenChange={onOpenChange}
         size="2xl"
+        scrollBehavior="inside"
       >
         <ModalContent>
           {(onClose) => (
@@ -66,10 +69,63 @@ export default function SettingsButton({
                 <Accordion>
                   <AccordionItem
                     key="1"
-                    aria-label="What is API key?"
-                    title="What is API key?"
+                    aria-label="What is Discord User Token?"
+                    title="What is Discord User Token?"
                   >
-                    lorem ipsum dolor
+                    <p className="mb-4">
+                      Your <strong>Discord User Token</strong> is a secret
+                      identifier that lets this app temporarily access your
+                      Discord account — specifically to read your favorite GIFs
+                      and emojis.
+                    </p>
+                    <Alert
+                      color="warning"
+                      description={
+                        <p>
+                          Never share your Discord token with anyone. It gives
+                          full access to your account. This app will only use it
+                          locally to fetch your GIFs and will never store or
+                          send your token anywhere else.
+                        </p>
+                      }
+                    />
+                  </AccordionItem>
+                  <AccordionItem
+                    key="2"
+                    aria-label="How to get your Discord User Token?"
+                    title="How to get your Discord User Token?"
+                  >
+                    <ol className="list-decimal ps-8 mb-4 space-y-0.5">
+                      <li>
+                        Open <strong>Discord in your browser</strong> (e.g.
+                        Chrome).
+                      </li>
+                      <li>
+                        Press <Kbd>F12</Kbd> to open DevTools.
+                      </li>
+                      <li>
+                        Go to the <strong>Console</strong> tab.
+                      </li>
+                      <li>
+                        Enable <strong>Device Emulation</strong>:
+                        <ul className="list-disc pl-5 mt-1">
+                          <li>
+                            Click the small phone icon{" "}
+                            <IconDevices className="inline size-5"></IconDevices>{" "}
+                            at the top-left of DevTools.
+                          </li>
+                          <li>Make sure the page reloads in mobile view.</li>
+                        </ul>
+                      </li>
+                      <li>
+                        Paste the code below and press <Kbd>Enter</Kbd>.
+                      </li>
+                      <li>
+                        Your Discord token will appear in the console — copy and
+                        paste it above.
+                      </li>
+                    </ol>
+
                     <div className="relative">
                       <div
                         className="[&_.shiki]:overflow-auto [&_.shiki]:p-4 [&_.shiki]:text-sm rounded-md overflow-hidden"
@@ -171,8 +227,8 @@ function APIKeyInput() {
       onChange={(e) => {
         setToken(e.target.value);
       }}
-      label="API Key"
-      placeholder="Enter your API key"
+      label="Discord User Token"
+      placeholder="Enter your Discord User Token"
       type={visible ? "text" : "password"}
       variant="bordered"
     />
