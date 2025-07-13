@@ -10,7 +10,7 @@ import {
 } from "@heroui/react";
 import { Chip } from "@heroui/react";
 import { Spinner } from "@heroui/react";
-import { IconCopy, IconPhotoX } from "@tabler/icons-react";
+import { IconCopy, IconDownload, IconPhotoX } from "@tabler/icons-react";
 import { useDebounceFn } from "ahooks";
 import {
   memo,
@@ -52,6 +52,19 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
     });
   }, [favGif.key]);
 
+  const onDownloadClick = useCallback(() => {
+    if (!cachedBlob?.blob) return;
+    const url = URL.createObjectURL(cachedBlob.blob);
+    const a = document.createElement("a");
+    a.href = url;
+    let fileName = favGif.key;
+    if (!fileName.endsWith(`.${favGif.type}`)) {
+      fileName += "." + favGif.type;
+    }
+    a.download = fileName;
+    a.click();
+  }, [cachedBlob, favGif]);
+
   const { mutate: updateGifCardNodeCache } = useUpdateGifCardNodeCache();
 
   useEffect(() => {
@@ -63,10 +76,18 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
           <CardHeader className="pb-0 pt-0 flex-col items-start gap-2 overflow-hidden">
             <div className="flex justify-between w-full">
               <Chip size="sm">{favGif.type}</Chip>
-              <IconCopy
-                className="text-content4 cursor-pointer size-6"
-                onClick={onCopyClick}
-              />
+              <div className="flex gap-1">
+                {cachedBlob?.blob && (
+                  <IconDownload
+                    className="text-content4 cursor-pointer size-6"
+                    onClick={onDownloadClick}
+                  />
+                )}
+                <IconCopy
+                  className="text-content4 cursor-pointer size-6"
+                  onClick={onCopyClick}
+                />
+              </div>
             </div>
             <ScrollingText
               text={favGif.key}
