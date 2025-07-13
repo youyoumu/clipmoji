@@ -1,7 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { atom, useAtom } from "jotai";
 import wretch from "wretch";
 
 import { db } from "#/lib/db";
+
+const defaultCachedBlobsProgress = {
+  total: 0,
+  bytes: 0,
+  cacheHit: 0,
+  addedCount: 0,
+  errorCount: 0,
+};
+export const updateCachedBlobsProgressAtom = atom(defaultCachedBlobsProgress);
 
 export function useCachedBlob(src: string) {
   return useQuery({
@@ -23,14 +33,29 @@ export function useCachedBlobs() {
 
 export function useUpdateCachedBlobs() {
   const queryClient = useQueryClient();
+  const [, setUpdateCachedBlobsProgress] = useAtom(
+    updateCachedBlobsProgressAtom,
+  );
+
   return useMutation({
     async mutationFn() {
       const favGifs = await db.favGif.toArray();
+      setUpdateCachedBlobsProgress((prev) => ({
+        ...prev,
+        total: favGifs.length,
+      }));
       let addedCount = 0;
       let errorCount = 0;
       for (const favGif of favGifs) {
         const cachedBlob = await db.cachedBlob.get({ src: favGif.src });
-        if (cachedBlob) continue;
+        if (cachedBlob) {
+          setUpdateCachedBlobsProgress((prev) => ({
+            ...prev,
+            bytes: prev.bytes + (cachedBlob.blob?.size ?? 0),
+            cacheHit: prev.cacheHit + 1,
+          }));
+          continue;
+        }
 
         let error: unknown;
         const res = await wretch(favGif.src)
@@ -42,7 +67,13 @@ export function useUpdateCachedBlobs() {
           });
         const blob = await res?.blob();
 
-        if (error) errorCount++;
+        if (error) {
+          errorCount++;
+          setUpdateCachedBlobsProgress((prev) => ({
+            ...prev,
+            errorCount: prev.errorCount + 1,
+          }));
+        }
         if (error instanceof wretch.WretchError) {
           // if status is 404, add it to the database
           if (error.status === 404) {
@@ -70,6 +101,11 @@ export function useUpdateCachedBlobs() {
             httpStatus: null,
           });
           addedCount++;
+          setUpdateCachedBlobsProgress((prev) => ({
+            ...prev,
+            bytes: prev.bytes + (blob.size ?? 0),
+            addedCount: prev.addedCount + 1,
+          }));
         }
       }
 
@@ -83,6 +119,9 @@ export function useUpdateCachedBlobs() {
       queryClient.invalidateQueries({
         queryKey: ["gifCardNodeCache"],
       });
+    },
+    onSettled() {
+      setUpdateCachedBlobsProgress(defaultCachedBlobsProgress);
     },
   });
 }

@@ -23,10 +23,15 @@ import {
 } from "@tabler/icons-react";
 import { IconCopy } from "@tabler/icons-react";
 import { useToggle } from "@uidotdev/usehooks";
+import { useAtom } from "jotai";
+import prettyBytes from "pretty-bytes";
 import type { ReactNode } from "react";
 
 import { env } from "#/env";
-import { useUpdateCachedBlobs } from "#/hooks/useCachedBlobs";
+import {
+  updateCachedBlobsProgressAtom,
+  useUpdateCachedBlobs,
+} from "#/hooks/useCachedBlobs";
 import {
   useExportFavoriteGifs,
   useFavoriteGifs,
@@ -267,6 +272,7 @@ function ImportButton() {
   function updateCachedBlobsWithToast() {
     addToast({
       title: "Fetching...",
+      description: <ImportButtonProgress />,
       promise: updateCachedBlobs(undefined, {
         onSuccess({ addedCount, errorCount }) {
           addToast({
@@ -319,6 +325,18 @@ function ImportButton() {
     >
       Import Favorite GIFs
     </Button>
+  );
+}
+
+function ImportButtonProgress() {
+  const [{ total, bytes, cacheHit, addedCount, errorCount }] = useAtom(
+    updateCachedBlobsProgressAtom,
+  );
+  return (
+    <p className="text-sm">
+      Total: {total}, Cache Hit: {cacheHit}, Added: {addedCount}, Error:{" "}
+      {errorCount}, Size: {prettyBytes(bytes)}
+    </p>
   );
 }
 

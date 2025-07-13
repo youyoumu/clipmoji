@@ -71,12 +71,18 @@ importers:
       gsap:
         specifier: ^3.13.0
         version: 3.13.0
+      jotai:
+        specifier: ^2.12.5
+        version: 2.12.5(@types/react@19.1.8)(react@19.1.0)
       jszip:
         specifier: ^3.10.1
         version: 3.10.1
       motion:
         specifier: ^12.19.2
         version: 12.19.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      pretty-bytes:
+        specifier: ^7.0.0
+        version: 7.0.0
       protobufjs:
         specifier: ^7.5.3
         version: 7.5.3
@@ -3081,6 +3087,18 @@ packages:
     resolution: {integrity: sha512-/imKNG4EbWNrVjoNC/1H5/9GFy+tqjGBHCaSsN+P2RnPqjsLmv6UD3Ej+Kj8nBWaRAwyk7kK5ZUc+OEatnTR3A==}
     hasBin: true
 
+  jotai@2.12.5:
+    resolution: {integrity: sha512-G8m32HW3lSmcz/4mbqx0hgJIQ0ekndKWiYP7kWVKi0p6saLXdSoye+FZiOFyonnd7Q482LCzm8sMDl7Ar1NWDw==}
+    engines: {node: '>=12.20.0'}
+    peerDependencies:
+      '@types/react': '>=17.0.0'
+      react: '>=17.0.0'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      react:
+        optional: true
+
   js-cookie@3.0.5:
     resolution: {integrity: sha512-cEiJEAEoIbWfCZYKWhVwFuvPX1gETRYPw6LlaTKoxD3s2AkXzkCjnp6h0V77ozyqj0jakteJ4YqDJT830+lVGw==}
     engines: {node: '>=14'}
@@ -3465,6 +3483,10 @@ packages:
     resolution: {integrity: sha512-I7AIg5boAr5R0FFtJ6rCfD+LFsWHp81dolrFD8S79U9tb8Az2nGrJncnMSnys+bpQJfRUzqs9hnA81OAA3hCuQ==}
     engines: {node: '>=14'}
     hasBin: true
+
+  pretty-bytes@7.0.0:
+    resolution: {integrity: sha512-U5otLYPR3L0SVjHGrkEUx5mf7MxV2ceXeE7VwWPk+hyzC5drNohsOGNPDZqxCqyX1lkbEN4kl1LiI8QFd7r0ZA==}
+    engines: {node: '>=20'}
 
   pretty-format@27.5.1:
     resolution: {integrity: sha512-Qb1gy5OrP5+zDf2Bvnzdl3jsTf1qXVMazbvCoKhtKqVs4/YK4ozX4gKQJJVyNe+cajNPn0KoC0MC3FUmaHWEmQ==}
@@ -8136,6 +8158,11 @@ snapshots:
 
   jiti@1.21.7: {}
 
+  jotai@2.12.5(@types/react@19.1.8)(react@19.1.0):
+    optionalDependencies:
+      '@types/react': 19.1.8
+      react: 19.1.0
+
   js-cookie@3.0.5: {}
 
   js-tokens@4.0.0: {}
@@ -8511,6 +8538,8 @@ snapshots:
   prelude-ls@1.2.1: {}
 
   prettier@3.6.2: {}
+
+  pretty-bytes@7.0.0: {}
 
   pretty-format@27.5.1:
     dependencies:
