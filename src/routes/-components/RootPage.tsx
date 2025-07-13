@@ -1,5 +1,6 @@
-import { Input } from "@heroui/react";
+import { Alert, Input } from "@heroui/react";
 import uFuzzy from "@leeoniya/ufuzzy";
+import { IconPhotoX } from "@tabler/icons-react";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { sort } from "fast-sort";
 import { useState, useTransition } from "react";
@@ -19,7 +20,7 @@ export function RootPage() {
 function RootPage_() {
   const [{ showDeadLinks }] = useSettings();
 
-  const { data: favoriteGifs = [] } = useFavoriteGifs({
+  const { data: favoriteGifs = [], isLoading: L1 } = useFavoriteGifs({
     withCacheBlob: !showDeadLinks,
   });
   const [search, setSearch] = useState("");
@@ -79,6 +80,20 @@ function RootPage_() {
           });
         }}
       />
+      {favoriteGifs.length === 0 && !L1 && (
+        <div className="w-full relative max-w-4xl mx-auto flex flex-col items-center justify-center p-8 gap-8">
+          <Alert
+            title="No GIFs yet"
+            description={
+              <p>
+                To get started, open the <strong>Settings</strong> and paste
+                your Discord token.
+              </p>
+            }
+          />
+          <IconPhotoX className="size-32 text-content2" />
+        </div>
+      )}
       <div
         className="w-full relative max-w-7xl mx-auto"
         style={{
