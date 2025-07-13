@@ -1,6 +1,5 @@
 import {
   Button,
-  Link,
   Navbar,
   NavbarBrand,
   NavbarContent,
@@ -9,6 +8,7 @@ import {
   NavbarMenuItem,
   NavbarMenuToggle,
 } from "@heroui/react";
+import { IconBrandGithub } from "@tabler/icons-react";
 import { type ReactNode, useState } from "react";
 
 import SettingsButton from "./SettingsButton";
@@ -47,6 +47,15 @@ export default function Layout({ children }: { children: ReactNode }) {
           justify="center"
         ></NavbarContent>
         <NavbarContent justify="end">
+          <NavbarItem>
+            <a
+              target="_blank"
+              href="https://github.com/youyoumu/clipmoji"
+              rel="noreferrer"
+            >
+              <IconBrandGithub className="cursor-pointer" />
+            </a>
+          </NavbarItem>
           <NavbarItem className="hidden sm:block">
             <SettingsButton />
           </NavbarItem>
