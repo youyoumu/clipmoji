@@ -12,11 +12,17 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Tooltip,
   useDisclosure,
 } from "@heroui/react";
-import { IconDevices, IconEye, IconEyeOff } from "@tabler/icons-react";
+import {
+  IconDevices,
+  IconEye,
+  IconEyeOff,
+  IconInfoCircle,
+} from "@tabler/icons-react";
 import { IconCopy } from "@tabler/icons-react";
-import { useLocalStorage, useToggle } from "@uidotdev/usehooks";
+import { useToggle } from "@uidotdev/usehooks";
 import type { ReactNode } from "react";
 
 import { env } from "#/env";
@@ -154,10 +160,23 @@ export default function SettingsButton({
                   </AccordionItem>
                 </Accordion>
                 <div className="flex py-2 px-1 flex-col gap-4">
-                  <CheckboxSetting
-                    settingKey="overwriteFavoriteGifs"
-                    text="Overwrite favorite GIFs"
-                  />
+                  <div className="flex gap-2">
+                    <CheckboxSetting
+                      settingKey="overwriteFavoriteGifs"
+                      text="Overwrite favorite GIFs"
+                    />
+                    <Tooltip
+                      content={
+                        <p className="text-xs w-64">
+                          If checked, your existing favorite GIFs will be
+                          deleted and replaced with the imported ones.
+                        </p>
+                      }
+                      color="primary"
+                    >
+                      <IconInfoCircle className="text-content4 cursor-pointer size-5" />
+                    </Tooltip>
+                  </div>
                   <CheckboxSetting
                     settingKey="showDeadLinks"
                     text="Show dead links"
