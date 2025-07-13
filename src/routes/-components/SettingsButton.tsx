@@ -19,6 +19,7 @@ import { IconCopy } from "@tabler/icons-react";
 import { useLocalStorage, useToggle } from "@uidotdev/usehooks";
 import type { ReactNode } from "react";
 
+import { env } from "#/env";
 import { useUpdateCachedBlobs } from "#/hooks/useCachedBlobs";
 import {
   useExportFavoriteGifs,
@@ -34,11 +35,10 @@ export default function SettingsButton({
   renderTrigger?: (onOpen: () => void) => ReactNode;
 }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [settings, setSettings] = useSettings();
 
   function onTestClick() {
     addToast({
-      title: "Fetching...",
+      title: "Test...",
       color: "default",
       timeout: 1000,
     });
@@ -167,9 +167,11 @@ export default function SettingsButton({
                   />
                 </div>
 
-                <Button variant="flat" onPress={onTestClick}>
-                  Test
-                </Button>
+                {env.DEV && (
+                  <Button variant="flat" onPress={onTestClick}>
+                    Test
+                  </Button>
+                )}
               </ModalBody>
               <ModalFooter className="flex-wrap">
                 <ExportButton />

@@ -3,6 +3,7 @@ import { createRootRoute, HeadContent, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { createPortal } from "react-dom";
 
+import { env } from "#/env";
 import { useSettings } from "#/hooks/useSettings";
 
 export const Route = createRootRoute({
@@ -38,10 +39,11 @@ function Component() {
     <>
       <HeadContent />
       <Outlet />
-      {createPortal(
-        <TanStackRouterDevtools />,
-        document.querySelector("body")!,
-      )}
+      {env.DEV &&
+        createPortal(
+          <TanStackRouterDevtools />,
+          document.querySelector("body")!,
+        )}
     </>
   );
 }
