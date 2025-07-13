@@ -23,9 +23,10 @@ import { env } from "#/env";
 import { useUpdateCachedBlobs } from "#/hooks/useCachedBlobs";
 import {
   useExportFavoriteGifs,
+  useFavoriteGifs,
   useUpdateFavoriteGifs,
 } from "#/hooks/useFavoriteGifs";
-import { useSettings } from "#/hooks/useSettings";
+import { useSettings, useToken } from "#/hooks/useSettings";
 import getApiKeyCode from "#/script/shiki/getApiKey.code.js?raw";
 import getApiKeyHtml from "#/shiki-output/getApiKey.code.js.html?raw";
 
@@ -213,7 +214,7 @@ function CheckboxSetting({
 }
 
 function APIKeyInput() {
-  const [token, setToken] = useLocalStorage<string>("token");
+  const [token, setToken] = useToken();
   const [visible, toggle] = useToggle(false);
 
   return (
@@ -238,7 +239,8 @@ function APIKeyInput() {
 }
 
 function ImportButton() {
-  const [settings] = useSettings();
+  const [token] = useToken();
+  const [{ overwriteFavoriteGifs }] = useSettings();
   const { mutateAsync: importGifs, isPending } = useUpdateFavoriteGifs();
 
   const { mutateAsync: updateCachedBlobs } = useUpdateCachedBlobs();
@@ -264,7 +266,7 @@ function ImportButton() {
     addToast({
       title: "Importing...",
       promise: importGifs(
-        { overwrite: settings.overwriteFavoriteGifs },
+        { overwrite: overwriteFavoriteGifs },
         {
           onSuccess({ addedCount, updatedCount, overwrite }) {
             addToast({
@@ -294,6 +296,7 @@ function ImportButton() {
       variant="solid"
       onPress={onImportClick}
       isLoading={isPending}
+      isDisabled={(token?.length ?? 0) < 50}
     >
       Import Favorite GIFs
     </Button>
@@ -301,6 +304,7 @@ function ImportButton() {
 }
 
 function ExportButton() {
+  const { data: favoriteGifs = [], isLoading: L1 } = useFavoriteGifs();
   const { mutateAsync: exportGifs, isPending } = useExportFavoriteGifs();
 
   function onExportClick() {
@@ -333,6 +337,7 @@ function ExportButton() {
       variant="solid"
       onPress={onExportClick}
       isLoading={isPending}
+      isDisabled={favoriteGifs.length === 0 || L1}
     >
       Export Favorite GIFs
     </Button>
