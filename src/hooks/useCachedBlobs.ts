@@ -39,6 +39,7 @@ export function useUpdateCachedBlobs() {
 
   return useMutation({
     async mutationFn() {
+      setUpdateCachedBlobsProgress(defaultCachedBlobsProgress);
       const favGifs = await db.favGif.toArray();
       setUpdateCachedBlobsProgress((prev) => ({
         ...prev,
@@ -119,9 +120,6 @@ export function useUpdateCachedBlobs() {
       queryClient.invalidateQueries({
         queryKey: ["gifCardNodeCache"],
       });
-    },
-    onSettled() {
-      setUpdateCachedBlobsProgress(defaultCachedBlobsProgress);
     },
   });
 }

@@ -102,12 +102,17 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
               if (!cachedBlob?.blob)
                 return (
                   <div
-                    className="w-full flex flex-col items-center justify-center"
+                    className="w-full flex flex-col items-center justify-center gap-2"
                     style={{
                       aspectRatio: `${favGif.width / favGif.height}`,
                     }}
                   >
                     <IconPhotoX className="size-12 text-content3" />
+                    {cachedBlob?.httpStatus && (
+                      <Chip size="sm" color="danger">
+                        {cachedBlob.httpStatus}
+                      </Chip>
+                    )}
                   </div>
                 );
               const blobUrl = URL.createObjectURL(cachedBlob.blob);
@@ -144,7 +149,14 @@ function GifCard_({ favGif }: { favGif: FavGif }) {
       );
       updateGifCardNodeCache({ id: favGif.id.toString(), node });
     });
-  }, [cachedBlob, L1, favGif, onCopyClick, updateGifCardNodeCache]);
+  }, [
+    cachedBlob,
+    L1,
+    favGif,
+    onCopyClick,
+    updateGifCardNodeCache,
+    onDownloadClick,
+  ]);
 
   if (!cardNode)
     return (
